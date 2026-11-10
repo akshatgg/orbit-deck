@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/*
+ * ORBIT design tokens — derived from the Orbit logo
+ * (violet → orbit blue → lavender → warm peach on near-black).
+ */
+@theme {
+  --color-ink: #070a12;
+  --color-navy: #10172a;
+  --color-navy-2: #172038;
+  --color-violet: #8066ff;
+  --color-violet-soft: #b7a8ff;
+  --color-blue: #3b82f6;
+  --color-cyan: #3de0ea;
+  --color-peach: #ffa36b;
+  --color-amber: #ffb547;
+  --color-lavender: #d6c8ff;
+  --color-snow: #f7f9fc;
+  --color-silver: #9ca9bc;
+  --color-dim: #5d6a80;
+  --color-line: rgb(156 169 188 / 0.14);
+
+  /* evidence status colours (neutral, not traffic-light hype) */
+  --color-st-supported: #4fd1a5;
+  --color-st-partial: #7cb4ff;
+  --color-st-untested: #9ca9bc;
+  --color-st-contradicted: #ff7a7a;
+
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  color-scheme: dark;
+  --grad-orbit: linear-gradient(120deg, #8066ff 0%, #3b82f6 45%, #3de0ea 100%);
+  --grad-warm: linear-gradient(120deg, #b7a8ff 0%, #ffa36b 100%);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-snow);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(128 102 255 / 0.45);
+}
+
+/* Typography helpers */
+.text-gradient {
+  background: var(--grad-orbit);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-warm {
+  background: var(--grad-warm);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Display sizes tuned for a 16:9 projector, but fluid down to phones */
+.t-display {
+  font-size: clamp(2.5rem, 6.2vw, 7rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.t-h1 {
+  font-size: clamp(2rem, 4.4vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+.t-h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.t-lead {
+  font-size: clamp(1.05rem, 1.45vw, 1.6rem);
+  line-height: 1.4;
+  color: var(--color-silver);
+}
+.t-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-violet-soft);
+}
+
+/* Restrained glass */
+.glass {
+  background: linear-gradient(180deg, rgb(23 32 56 / 0.72), rgb(16 23 42 / 0.6));
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.glass-strong {
+  background: rgb(16 23 42 / 0.92);
+  border: 1px solid rgb(156 169 188 / 0.2);
+  backdrop-filter: blur(20px);
+}
+
+/* Atmospheric background */
+.atmosphere {
+  background:
+    radial-gradient(60% 50% at 15% 10%, rgb(128 102 255 / 0.16), transparent 60%),
+    radial-gradient(50% 45% at 90% 85%, rgb(59 130 246 / 0.14), transparent 60%),
+    radial-gradient(40% 35% at 85% 10%, rgb(255 163 107 / 0.06), transparent 60%),
+    var(--color-ink);
+}
+
+.grid-faint {
+  background-image:
+    linear-gradient(rgb(156 169 188 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(156 169 188 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(70% 70% at 50% 50%, black, transparent);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(156 169 188 / 0.25) transparent;
+}
+
+button {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
