@@ -201,6 +201,32 @@ export function StageLabel({ stage, className = '' }: { stage: StageId; classNam
 }
 
 /**
+ * One-line version of the learning device for Present mode: short phrases flowing
+ * Believed → Learned → Changed (investigated optional). Pass SHORT phrases (≤ 8 words).
+ */
+export function LearningStrip({ believed, investigated, learned, changed, show = true, className = '' }: { believed: string; investigated?: string; learned: string; changed: string; show?: boolean; className?: string }) {
+  const items = [
+    { t: 'Believed', v: believed, c: 'var(--color-silver)' },
+    ...(investigated ? [{ t: 'Investigated', v: investigated, c: 'var(--color-ev-observed)' }] : []),
+    { t: 'Learned', v: learned, c: 'var(--color-st-supported)' },
+    { t: 'Changed', v: changed, c: 'var(--color-ev-proposed)' },
+  ]
+  return (
+    <div className={`flex flex-wrap items-stretch gap-2 ${className}`} aria-label="What we believed, learned and changed">
+      {items.map((it, i) => (
+        <Reveal key={it.t} show={show} delay={i * 0.12} className="flex items-center gap-2">
+          <div className="lift rounded-xl border border-line bg-navy/70 px-3.5 py-2">
+            <div className="font-mono text-[10px] uppercase tracking-[0.14em]" style={{ color: it.c }}>{it.t}</div>
+            <div className="text-[15px] leading-snug text-snow">{it.v}</div>
+          </div>
+          {i < items.length - 1 && <span className="text-lg text-dim">→</span>}
+        </Reveal>
+      ))}
+    </div>
+  )
+}
+
+/**
  * The recurring storytelling device (§2) that closes every major chapter:
  * What we believed → What we investigated → What we learned → What changed.
  * `compact` renders one row for present mode.
