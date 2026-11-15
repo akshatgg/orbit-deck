@@ -27,7 +27,7 @@ export function Kicker({ children, className = '' }: { children: ReactNode; clas
   return <div className={`t-kicker ${className}`}>{children}</div>
 }
 
-/** Fade/slide-in gated by `show` (presenter step) — animates out when hidden. */
+/** Fade/slide-in gated by `show` (presenter step) — rises out of depth, animates out when hidden. */
 export function Reveal({
   show = true,
   delay = 0,
@@ -48,8 +48,9 @@ export function Reveal({
     <M
       className={className}
       initial={false}
-      animate={show ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y, filter: 'blur(6px)' }}
-      transition={{ duration: 0.7, ease, delay: show ? delay : 0 }}
+      style={{ transformPerspective: 900 }}
+      animate={show ? { opacity: 1, y: 0, rotateX: 0, scale: 1, filter: 'blur(0px)' } : { opacity: 0, y, rotateX: 10, scale: 0.98, filter: 'blur(8px)' }}
+      transition={{ duration: 0.8, ease, delay: show ? delay : 0 }}
       aria-hidden={!show}
     >
       {children}
@@ -57,24 +58,93 @@ export function Reveal({
   )
 }
 
-/** Staggered word-by-word headline. */
-export function SplitHeadline({ text, show = true, className = '', delay = 0 }: { text: string; show?: boolean; className?: string; delay?: number }) {
+/**
+ * Parse accent markers: words wrapped in *asterisks* render as the glowing serif accent.
+ * With no markers and `autoAccent`, a two-sentence headline accents its second sentence,
+ * otherwise the last two words.
+ */
+function splitAccent(text: string, autoAccent: boolean): { w: string; accent: boolean }[] {
+  if (text.includes('*')) {
+    const out: { w: string; accent: boolean }[] = []
+    text.split(/(\*[^*]+\*)/).forEach((part) => {
+      const accent = part.startsWith('*') && part.endsWith('*')
+      part.replace(/\*/g, '').split(' ').filter(Boolean).forEach((w) => out.push({ w, accent }))
+    })
+    return out
+  }
   const words = text.split(' ')
+  if (!autoAccent || words.length < 4) return words.map((w) => ({ w, accent: false }))
+  const sentences = text.match(/[^.?!]+[.?!]+/g)
+  let from = words.length - 2
+  if (sentences && sentences.length >= 2) from = words.length - sentences[sentences.length - 1].trim().split(' ').length
+  return words.map((w, i) => ({ w, accent: i >= from }))
+}
+
+/** Staggered 3D word-flip headline (words rise and rotate in from below). */
+export function SplitHeadline({ text, show = true, className = '', delay = 0, autoAccent = false }: { text: string; show?: boolean; className?: string; delay?: number; autoAccent?: boolean }) {
+  const words = splitAccent(text, autoAccent)
+  const plain = text.replace(/\*/g, '')
   return (
-    <span className={className} aria-label={text}>
-      {words.map((w, i) => (
-        <span key={i} className="-mx-[0.08em] inline-block overflow-hidden px-[0.08em] pb-[0.08em] align-bottom" aria-hidden>
+    <span className={className} aria-label={plain} style={{ perspective: 900 }}>
+      {words.map(({ w, accent }, i) => (
+        <span key={i} className="-mx-[0.08em] inline-block px-[0.08em] pb-[0.1em] align-bottom" aria-hidden>
           <motion.span
-            className="inline-block"
+            className={`inline-block origin-bottom ${accent ? 'accent' : ''}`}
             initial={false}
-            animate={show ? { y: '0%', opacity: 1 } : { y: '105%', opacity: 0 }}
-            transition={{ duration: 0.75, ease, delay: show ? delay + i * 0.045 : 0 }}
+            animate={show ? { y: '0%', opacity: 1, rotateX: 0, filter: 'blur(0px)' } : { y: '60%', opacity: 0, rotateX: -75, filter: 'blur(6px)' }}
+            transition={{ duration: 0.9, ease, delay: show ? delay + i * 0.05 : 0 }}
           >
             {w}
-            {i < words.length - 1 ? ' ' : ''}
+            {i < words.length - 1 ? '\u00a0' : ''}
           </motion.span>
         </span>
       ))}
+    </span>
+  )
+}
+
+/** Inline expressive accent (serif italic, animated gradient, soft glow). */
+export const Accent = ({ children, warm = false, className = '' }: { children: ReactNode; warm?: boolean; className?: string }) => (
+  <span className={`${warm ? 'accent-warm' : 'accent'} ${className}`}>{children}</span>
+)
+
+/** Card that tilts in 3D toward the pointer, with a moving glare. Purely decorative motion. */
+export function TiltCard({ children, className = '', max = 6, glow = false }: { children: ReactNode; className?: string; max?: number; glow?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const reduce = useReducedMotion()
+  const [t, setT] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, on: false })
+  return (
+    <motion.div
+      ref={ref}
+      className={`glass relative overflow-hidden rounded-2xl ${glow ? 'glow-ring' : ''} ${className}`}
+      style={{ transformPerspective: 1000, transformStyle: 'preserve-3d' }}
+      animate={{ rotateX: t.rx, rotateY: t.ry }}
+      transition={{ type: 'spring', stiffness: 180, damping: 18, mass: 0.6 }}
+      onPointerMove={(e) => {
+        if (reduce || !ref.current) return
+        const r = ref.current.getBoundingClientRect()
+        const px = (e.clientX - r.left) / r.width
+        const py = (e.clientY - r.top) / r.height
+        setT({ rx: (0.5 - py) * max, ry: (px - 0.5) * max, gx: px * 100, gy: py * 100, on: true })
+      }}
+      onPointerLeave={() => setT({ rx: 0, ry: 0, gx: 50, gy: 50, on: false })}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+        style={{ opacity: t.on ? 1 : 0, background: `radial-gradient(420px circle at ${t.gx}% ${t.gy}%, rgb(255 255 255 / 0.07), transparent 45%)` }}
+      />
+      {children}
+    </motion.div>
+  )
+}
+
+/** Big luminous number that counts up (pitch-style stat). */
+export function GlowNumber({ value, format, className = '', suffix }: { value: number; format?: (n: number) => string; className?: string; suffix?: ReactNode }) {
+  return (
+    <span className={`inline-flex items-baseline gap-2 ${className}`}>
+      <CountUp value={value} format={format} className="glow-num font-semibold tracking-tight text-snow" />
+      {suffix}
     </span>
   )
 }
@@ -183,7 +253,7 @@ export function StatusPill({ status, className = '' }: { status: Status; classNa
 
 export function Card({ children, className = '', glow = false }: { children: ReactNode; className?: string; glow?: boolean }) {
   return (
-    <div className={`glass relative rounded-2xl ${glow ? 'shadow-[0_0_60px_-20px_rgba(128,102,255,0.6)]' : ''} ${className}`}>{children}</div>
+    <div className={`glass relative rounded-2xl ${glow ? 'glow-ring shadow-[0_0_60px_-20px_rgba(139,92,246,0.6)]' : ''} ${className}`}>{children}</div>
   )
 }
 
@@ -234,7 +304,7 @@ export function Button({
 }) {
   const sizes = { sm: 'px-3 py-1.5 text-xs', md: 'px-4.5 py-2.5 text-sm', lg: 'px-7 py-3.5 text-base' }
   const variants = {
-    primary: 'bg-snow text-ink hover:bg-white shadow-[0_8px_30px_-10px_rgba(128,102,255,0.7)]',
+    primary: 'bg-snow text-ink hover:bg-white shadow-[0_8px_30px_-10px_rgba(139,92,246,0.8)] hover:shadow-[0_10px_40px_-8px_rgba(139,92,246,0.95)]',
     ghost: 'text-silver hover:text-snow hover:bg-white/5',
     outline: 'border border-line text-snow hover:border-violet/60 hover:bg-violet/10',
   }
@@ -317,7 +387,7 @@ export function ChapterHeader({ num, kicker, title, lead, show = true, center = 
           <span className="text-dim">{num}</span> <span className="mx-2 text-dim">/</span> {kicker}
         </Kicker>
       </Reveal>
-      <h2 className="t-h1 mt-4">{typeof title === 'string' ? <SplitHeadline text={title} show={show} delay={0.08} /> : title}</h2>
+      <h2 className="t-h1 mt-4">{typeof title === 'string' ? <SplitHeadline text={title} show={show} delay={0.08} autoAccent /> : title}</h2>
       {lead && (
         <Reveal show={show} delay={0.25}>
           <p className={`t-lead mt-5 max-w-3xl ${center ? 'mx-auto' : ''}`}>{lead}</p>

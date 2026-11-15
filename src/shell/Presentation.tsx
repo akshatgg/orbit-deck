@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, CircleHelp, ExternalLink, LayoutGrid, ListCh
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { chapterComponents } from '../chapters'
 import { JourneyMap } from '../components/journey/JourneyMap'
+import { OrbitField } from '../components/OrbitField'
 import { AssumptionTracker } from '../components/tracker/AssumptionTracker'
 import { Logo, ease } from '../components/ui'
 import { chapterIndex, chapters, stages } from '../data/chapters'
@@ -243,24 +244,52 @@ export function Presentation({ idx, step, go }: { idx: number; step: number; go:
   }
 
   return (
-    <div className="atmosphere fixed inset-0 overflow-hidden text-snow">
+    <div
+      className="atmosphere fixed inset-0 overflow-hidden text-snow"
+      onPointerMove={(e) => {
+        const el = e.currentTarget
+        el.style.setProperty('--mx', `${e.clientX}px`)
+        el.style.setProperty('--my', `${e.clientY}px`)
+      }}
+    >
       <div className="grid-faint pointer-events-none absolute inset-0" />
+      {/* evolving constellation of evidence: grows with the journey, freezes for the verdict, converges at the finale */}
+      {idx > 0 && (
+        <motion.div className="pointer-events-none absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: meta.slug === 'verdict' && step < meta.steps - 1 ? 0.45 : 1 }} transition={{ duration: 1.2 }}>
+          <OrbitField
+            intensity={0.22 + 0.78 * (idx / (chapters.length - 1))}
+            converge={meta.slug === 'verdict' && step === meta.steps - 1 ? 1 : 0}
+            freeze={meta.slug === 'verdict' && step < meta.steps - 1}
+            labels={false}
+            dim={!(meta.slug === 'verdict' && step === meta.steps - 1)}
+          />
+        </motion.div>
+      )}
+      <div className="spotlight pointer-events-none absolute inset-0" />
 
-      {/* stage */}
-      <AnimatePresence mode="popLayout" initial={false} custom={dir.current}>
-        <motion.main
-          key={meta.slug}
-          custom={dir.current}
-          initial={{ opacity: 0, scale: 0.985, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, scale: 1.01, filter: 'blur(8px)' }}
-          transition={{ duration: 0.55, ease }}
-          className="scrollbar-thin absolute inset-0 overflow-y-auto overflow-x-hidden"
-          aria-label={`Chapter ${meta.num}: ${meta.title}`}
-        >
-          <Chapter mode="present" step={step} setStep={setStep} />
-        </motion.main>
-      </AnimatePresence>
+      {/* stage — chapters swing through depth in the direction of travel */}
+      <div className="absolute inset-0" style={{ perspective: 1600 }}>
+        <AnimatePresence mode="popLayout" initial={false} custom={dir.current}>
+          <motion.main
+            key={meta.slug}
+            custom={dir.current}
+            variants={{
+              enter: (d: number) => ({ opacity: 0, x: 90 * d, rotateY: -14 * d, scale: 0.92, filter: 'blur(12px)' }),
+              center: { opacity: 1, x: 0, rotateY: 0, scale: 1, filter: 'blur(0px)' },
+              exit: (d: number) => ({ opacity: 0, x: -90 * d, rotateY: 14 * d, scale: 0.94, filter: 'blur(12px)' }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.75, ease }}
+            style={{ transformOrigin: '50% 50%' }}
+            className="scrollbar-thin absolute inset-0 overflow-y-auto overflow-x-hidden"
+            aria-label={`Chapter ${meta.num}: ${meta.title}`}
+          >
+            <Chapter mode="present" step={step} setStep={setStep} />
+          </motion.main>
+        </AnimatePresence>
+      </div>
 
       {/* top chrome */}
       <motion.header

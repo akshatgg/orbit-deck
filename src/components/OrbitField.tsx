@@ -13,6 +13,8 @@ export function OrbitField({
   converge = 0,
   labels = true,
   dim = false,
+  freeze = false,
+  parallax = true,
   onCount,
   className = '',
 }: {
@@ -20,12 +22,16 @@ export function OrbitField({
   converge?: number
   labels?: boolean
   dim?: boolean
+  /** stop orbital motion (e.g. a frozen moment or a calm verdict) — particles stay visible */
+  freeze?: boolean
+  /** drift gently with the pointer for depth */
+  parallax?: boolean
   onCount?: (n: number) => void
   className?: string
 }) {
   const ref = useRef<HTMLCanvasElement>(null)
-  const props = useRef({ intensity, converge, labels, dim, onCount })
-  props.current = { intensity, converge, labels, dim, onCount }
+  const props = useRef({ intensity, converge, labels, dim, freeze, parallax, onCount })
+  props.current = { intensity, converge, labels, dim, freeze, parallax, onCount }
 
   useEffect(() => {
     const canvas = ref.current!
@@ -45,8 +51,15 @@ export function OrbitField({
     const ro = new ResizeObserver(resize)
     ro.observe(canvas)
 
-    const N = 140
-    const palette = ['#8066FF', '#3B82F6', '#3DE0EA', '#B7A8FF', '#FFA36B', '#D6C8FF']
+    const N = 160
+    const palette = ['#8B5CF6', '#6D8BFA', '#38BDF8', '#C4B5FD', '#FDBA74', '#DDD6FE']
+    // pointer parallax (depth): nearer (larger) particles move more
+    const ptr = { x: 0, y: 0, tx: 0, ty: 0 }
+    const onMove = (e: PointerEvent) => {
+      ptr.tx = e.clientX / window.innerWidth - 0.5
+      ptr.ty = e.clientY / window.innerHeight - 0.5
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
     const rand = mulberry32(7)
     const nodes = Array.from({ length: N }, (_, i) => {
       const r = 0.12 + Math.pow(rand(), 0.7) * 0.75
@@ -72,8 +85,13 @@ export function OrbitField({
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
-      if (!reduce) t += dt
-      const { intensity, converge, labels, dim, onCount } = props.current
+      const { intensity, converge, labels, dim, freeze, parallax, onCount } = props.current
+      const moving = !reduce && !freeze
+      if (moving) t += dt
+      if (parallax && !reduce) {
+        ptr.x += (ptr.tx - ptr.x) * Math.min(1, dt * 3)
+        ptr.y += (ptr.ty - ptr.y) * Math.min(1, dt * 3)
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, w, h)
       const cx = w / 2
@@ -85,15 +103,16 @@ export function OrbitField({
       for (const n of nodes) {
         if (n.born > intensity) continue
         visible++
-        if (!reduce) n.a += n.speed * dt
+        if (moving) n.a += n.speed * dt
         n.conv += (converge - n.conv) * Math.min(1, dt * 2.2)
         const ox = cx + Math.cos(n.a) * n.r * R
         const oy = cy + Math.sin(n.a) * n.r * R * n.tilt
         const rr = Math.min(w, h) * 0.3
         const tx = cx + Math.cos(n.ringA + t * 0.15) * rr
         const ty = cy + Math.sin(n.ringA + t * 0.15) * rr * 0.62
-        const x = ox + (tx - ox) * n.conv
-        const y = oy + (ty - oy) * n.conv
+        const depth = n.size / 3
+        const x = ox + (tx - ox) * n.conv - ptr.x * 46 * depth
+        const y = oy + (ty - oy) * n.conv - ptr.y * 30 * depth
         const fadeIn = Math.min(1, (intensity - n.born) * 8)
         const alpha = fadeIn * (dim ? 0.35 : 1)
         pts.push({ x, y, n, alpha })
@@ -104,11 +123,33 @@ export function OrbitField({
         ctx.lineWidth = 0.6
         for (let i = 0; i < pts.length; i++) {
           const p = pts[i]
-          ctx.strokeStyle = `rgba(128,102,255,${0.22 * converge * p.alpha})`
+          ctx.strokeStyle = `rgba(139,92,246,${0.22 * converge * p.alpha})`
           ctx.beginPath()
           ctx.moveTo(p.x, p.y)
           ctx.lineTo(cx, cy)
           ctx.stroke()
+        }
+      }
+
+      // constellation: faint links between near neighbours
+      if (converge < 0.3) {
+        ctx.lineWidth = 0.5
+        const maxD = Math.min(w, h) * 0.085
+        for (let i = 0; i < pts.length; i += 2) {
+          const a = pts[i]
+          for (let j = i + 1; j < Math.min(pts.length, i + 22); j++) {
+            const b = pts[j]
+            const dx = a.x - b.x
+            const dy = a.y - b.y
+            const d = Math.sqrt(dx * dx + dy * dy)
+            if (d < maxD) {
+              ctx.strokeStyle = `rgba(148,163,255,${(1 - d / maxD) * 0.16 * Math.min(a.alpha, b.alpha)})`
+              ctx.beginPath()
+              ctx.moveTo(a.x, a.y)
+              ctx.lineTo(b.x, b.y)
+              ctx.stroke()
+            }
+          }
         }
       }
 
@@ -152,6 +193,7 @@ export function OrbitField({
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      window.removeEventListener('pointermove', onMove)
     }
   }, [])
 

@@ -74,7 +74,7 @@ const ScenarioBar = () => (
 function Cover({ setStep }: { setStep: (n: number) => void }) {
   return (
     <Scene>
-      <OrbitField intensity={0.28} labels={false} dim />
+      <OrbitField intensity={0.85} labels />
       <div className="relative z-10 max-w-6xl">
         <StageLabel stage={meta.stage} />
         <h1 className="t-display mt-6">
@@ -145,7 +145,7 @@ function Notifications({ step }: { step: number }) {
 function OrbitReveal() {
   return (
     <Scene>
-      <OrbitField intensity={0.18} labels={false} dim />
+      <OrbitField intensity={0.7} converge={1} labels={false} />
       <ScenarioBar />
       <div className="relative z-10 flex w-full flex-col items-center">
         <div className="relative flex h-[300px] w-full max-w-5xl flex-col items-center justify-center">

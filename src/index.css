@@ -120,6 +120,7 @@ body {
 .glass {
   background: linear-gradient(180deg, rgb(26 34 52 / 0.7), rgb(17 24 39 / 0.62));
   border: 1px solid var(--color-line);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 20px 50px -30px rgb(0 0 0 / 0.7);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -132,8 +133,9 @@ body {
 /* Atmospheric background */
 .atmosphere {
   background:
-    radial-gradient(60% 50% at 15% 10%, rgb(139 92 246 / 0.10), transparent 60%),
-    radial-gradient(50% 45% at 90% 85%, rgb(56 189 248 / 0.07), transparent 60%),
+    radial-gradient(60% 50% at 15% 10%, rgb(139 92 246 / 0.18), transparent 60%),
+    radial-gradient(50% 45% at 90% 85%, rgb(56 189 248 / 0.14), transparent 60%),
+    radial-gradient(40% 35% at 85% 10%, rgb(253 186 116 / 0.06), transparent 60%),
     var(--color-ink);
 }
 
@@ -172,4 +174,95 @@ button {
 /* Static fallback when motion is reduced: stop decorative canvas loops */
 .paused-motion * {
   animation-play-state: paused !important;
+}
+
+/* ---------- Motion & depth layer ---------- */
+
+/* animated gradient sheen on accent text */
+.text-gradient,
+.text-gradient-warm {
+  background-size: 200% 100%;
+  animation: sheen 8s ease-in-out infinite alternate;
+}
+@keyframes sheen {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+/* expressive accent: serif italic + gradient + soft glow */
+.accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  background: var(--grad-orbit);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 28px rgb(139 92 246 / 0.35));
+  padding-right: 0.06em;
+}
+.accent-warm {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  background: var(--grad-warm);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 24px rgb(253 186 116 / 0.25));
+  padding-right: 0.06em;
+}
+
+/* luminous numbers */
+.glow-num {
+  text-shadow: 0 0 40px rgb(139 92 246 / 0.45), 0 0 90px rgb(56 189 248 / 0.18);
+}
+
+/* glowing ring border (animated conic) for hero cards */
+.glow-ring {
+  position: relative;
+  isolation: isolate;
+}
+.glow-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--ring-angle, 0deg), rgb(139 92 246 / 0.9), rgb(56 189 248 / 0.7), rgb(253 186 116 / 0.5), rgb(139 92 246 / 0.9));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: ring-spin 6s linear infinite;
+  z-index: -1;
+}
+@property --ring-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes ring-spin {
+  to { --ring-angle: 360deg; }
+}
+
+/* pointer spotlight (set --mx / --my from JS) */
+.spotlight {
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 40%), rgb(139 92 246 / 0.09), transparent 45%);
+}
+
+/* subtle hover lift for interactive cards */
+.lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s, border-color 0.35s;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 60px -28px rgb(139 92 246 / 0.55);
+  border-color: rgb(139 92 246 / 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient, .text-gradient-warm, .accent, .glow-ring::before { animation: none; }
+  .lift:hover { transform: none; }
 }
