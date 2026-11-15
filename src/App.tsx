@@ -2,6 +2,7 @@ import { MotionConfig } from 'framer-motion'
 import { Explore } from './shell/Explore'
 import { Presentation } from './shell/Presentation'
 import { PresenterWindow } from './shell/PresenterPanel'
+import { Rehearsal } from './shell/Rehearsal'
 import { useRoute } from './shell/route'
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
       {route.view === 'present' && <Presentation idx={route.idx} step={route.step} go={go} />}
       {route.view === 'explore' && <Explore section={route.section} go={go} />}
       {route.view === 'presenter' && <PresenterWindow />}
+      {route.view === 'rehearse' && <Rehearsal go={go} />}
     </MotionConfig>
   )
 }

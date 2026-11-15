@@ -1,14 +1,206 @@
-import { ChapterHeader, Stage } from '../components/ui'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
+import { ChannelChart } from '../components/discovery/ChannelChart'
+import { DotField, type DotView } from '../components/discovery/DotField'
+import { ChapterHeader, EvidenceTag, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
+import type { Learning } from '../data/evidence'
+import { discoveryRelatedMisses, headlineFindings, interviewN, keyInsight, missCausesListedTotal, quotes, surveyN } from '../data/research'
 import type { ChapterProps } from '../shell/types'
 
-// STUB — to be implemented
 const meta = chapters.find((c) => c.slug === 'what-students-told-us')!
 
+const learning: Learning = {
+  believed: 'Students need more events, or one app with everything in it.',
+  investigated: 'Survey counts (n = 42) and interview accounts (n = 13).',
+  learned: 'Misses are mostly late discovery, deadlines and full events, and students hear via friends and email, not event apps.',
+  changed: 'Timely, relevant discovery became the focus.',
+}
+
+const viewOfStep: DotView[] = ['all', 'missed', 'toomany', 'interview', 'causes']
+const viewLabels: { v: DotView; t: string }[] = [
+  { v: 'all', t: `All ${surveyN}` },
+  { v: 'missed', t: 'Missed an event' },
+  { v: 'toomany', t: 'Too many places' },
+  { v: 'interview', t: 'Interviews' },
+  { v: 'causes', t: 'Causes' },
+]
+
+const [fMissed, fToomany, fInterview] = headlineFindings
+
+function Big({ value, of, children }: { value: number; of: number; children: string }) {
+  return (
+    <div>
+      <div className="flex items-baseline gap-3">
+        <span className="num text-[clamp(4rem,9vw,8rem)] font-medium leading-none text-ev-observed">{value}</span>
+        <span className="num text-3xl text-silver sm:text-4xl">of {of}</span>
+      </div>
+      <p className="mt-3 max-w-md text-xl leading-snug text-snow sm:text-2xl">{children}</p>
+    </div>
+  )
+}
+
+function ViewPanel({ view }: { view: DotView }) {
+  return (
+    <div className="space-y-3">
+      {view === 'all' && (
+        <div>
+          <span className="num text-[clamp(4rem,9vw,8rem)] font-medium leading-none text-snow">{surveyN}</span>
+          <p className="mt-3 max-w-md text-xl leading-snug text-snow sm:text-2xl">analysed survey responses. Each dot is one respondent.</p>
+        </div>
+      )}
+      {view === 'missed' && <Big value={fMissed.value} of={fMissed.of}>{`reported missing at least one event in the previous four weeks`}</Big>}
+      {view === 'toomany' && <Big value={fToomany.value} of={fToomany.of}>{`agreed that there were too many places to check`}</Big>}
+      {view === 'interview' && (
+        <div>
+          <Big value={fInterview.value} of={fInterview.of}>{`interviewees described missing an event or finding out about it too late`}</Big>
+          <p className="mt-3 text-sm text-silver">A separate evidence source: {interviewN} semi-structured interviews, not the survey.</p>
+        </div>
+      )}
+      {view === 'causes' && (
+        <div>
+          <div className="flex items-baseline gap-3">
+            <span className="num text-[clamp(3.5rem,7vw,6rem)] font-medium leading-none text-ev-observed">{discoveryRelatedMisses}</span>
+            <span className="text-xl text-snow sm:text-2xl">late + deadline + full</span>
+          </div>
+          <p className="mt-3 text-base leading-snug text-snow sm:text-lg">
+            Cause of each respondent’s most recent miss. These five listed categories account for {missCausesListedTotal} of {surveyN} analysed responses; the other {surveyN - missCausesListedTotal} (grey) are not in the listed categories.
+          </p>
+          <p className="mt-3 border-l-2 border-ev-unresolved pl-3 text-sm leading-snug text-silver sm:text-base">
+            These indicate a potentially addressable discovery problem, but they do not establish that Orbit could have prevented all {discoveryRelatedMisses} missed events.
+          </p>
+        </div>
+      )}
+      <EvidenceTag label="observed" />
+    </div>
+  )
+}
+
+const Quotes = () => (
+  <div className="flex flex-col justify-center gap-4">
+    {quotes.map((q) => (
+      <figure key={q.text} className="rounded-2xl border border-line bg-navy/60 p-5">
+        <blockquote className="font-serif text-2xl italic leading-snug text-snow sm:text-[1.75rem]">“{q.text}”</blockquote>
+        <figcaption className="mt-3 flex items-center gap-3 text-sm text-silver">
+          {q.who} <EvidenceTag label="observed" />
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+)
+
+const Insight = ({ large }: { large?: boolean }) => (
+  <p className={`max-w-5xl font-medium leading-[1.12] tracking-tight text-snow ${large ? 'text-[clamp(1.75rem,3.6vw,3.5rem)]' : 'text-[clamp(1.5rem,2.6vw,2.5rem)]'}`}>
+    {keyInsight}
+  </p>
+)
+
+const DOT_NOTE = 'Dot arrangement is illustrative: it shows counts, not which respondents overlap between questions.'
+
 export default function Ch04WhatStudentsToldUs({ mode, step }: ChapterProps) {
+  const [exploreView, setExploreView] = useState<DotView>('all')
+
+  if (mode === 'explore') {
+    return (
+      <Stage mode={mode}>
+        <StageLabel stage={meta.stage} className="mb-3" />
+        <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} lead="Survey n = 42 and interviews n = 13. Each dot is one analysed survey response." />
+        <div className="mt-10 space-y-12">
+          <section className="grid gap-8 lg:grid-cols-[1.25fr_1fr]">
+            <div>
+              <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Dot view">
+                {viewLabels.map((b) => (
+                  <button
+                    key={b.v}
+                    type="button"
+                    aria-pressed={exploreView === b.v}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setExploreView(b.v)
+                    }}
+                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${exploreView === b.v ? 'border-ev-observed bg-ev-observed/15 text-snow' : 'border-line text-silver hover:text-snow'}`}
+                  >
+                    {b.t}
+                  </button>
+                ))}
+              </div>
+              <div className="glass rounded-2xl p-4">
+                <DotField view={exploreView} />
+              </div>
+              <SourceNote className="mt-3">S3, S4 · {DOT_NOTE}</SourceNote>
+            </div>
+            <div className="flex items-center">
+              <ViewPanel view={exploreView} />
+            </div>
+          </section>
+
+          <section>
+            <h3 className="t-h2 mb-4">Where students actually hear about events</h3>
+            <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+              <ChannelChart />
+              <Quotes />
+            </div>
+            <SourceNote className="mt-3">S3, S4 · Survey n = {surveyN}, multiple response. Quotes are anonymised interview excerpts.</SourceNote>
+          </section>
+
+          <section>
+            <div className="t-kicker mb-3">Key insight</div>
+            <Insight large />
+          </section>
+          <LearningCard learning={learning} />
+        </div>
+      </Stage>
+    )
+  }
+
   return (
     <Stage mode={mode}>
-      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} lead={`step ${step + 1} / ${meta.steps}`} />
+      <StageLabel stage={meta.stage} className="mb-3" />
+      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
+
+      <div className="mt-5">
+        <AnimatePresence mode="wait" initial={false}>
+          {step <= 4 && (
+            <motion.div key="dots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease }} className="grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
+              <div>
+                <div className="glass rounded-2xl p-4">
+                  <DotField view={viewOfStep[step]} />
+                </div>
+                <SourceNote className="mt-2">S3, S4 · {DOT_NOTE}</SourceNote>
+              </div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div key={viewOfStep[step]} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}>
+                  <ViewPanel view={viewOfStep[step]} />
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+          )}
+          {step === 5 && (
+            <motion.div key="chan" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease }}>
+              <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+                <div>
+                  <div className="mb-2 flex items-center gap-3">
+                    <span className="t-kicker !text-[11px]">How students hear about events</span>
+                    <EvidenceTag label="observed" />
+                  </div>
+                  <ChannelChart />
+                </div>
+                <Quotes />
+              </div>
+              <SourceNote className="mt-3">S3, S4 · Survey n = {surveyN}; quotes from the interviews (n = {interviewN}).</SourceNote>
+            </motion.div>
+          )}
+          {step === 6 && (
+            <motion.div key="insight" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="space-y-6">
+              <div className="t-kicker">Key insight</div>
+              <Insight large />
+              <Reveal show delay={0.3}>
+                <LearningCard learning={learning} compact />
+              </Reveal>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </Stage>
   )
 }

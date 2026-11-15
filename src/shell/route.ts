@@ -5,11 +5,13 @@ export type Route =
   | { view: 'present'; idx: number; step: number }
   | { view: 'explore'; section: string | null }
   | { view: 'presenter' }
+  | { view: 'rehearse' }
 
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   if (parts[0] === 'explore') return { view: 'explore', section: parts[1] ?? null }
   if (parts[0] === 'presenter') return { view: 'presenter' }
+  if (parts[0] === 'rehearse') return { view: 'rehearse' }
   if (parts[0] === 'present') {
     const i = chapterIndex(parts[1] ?? '')
     const idx = i < 0 ? 0 : i
@@ -41,7 +43,7 @@ export function useRoute(): [Route, (hash: string, replace?: boolean) => void] {
 /* Presenter-window sync over BroadcastChannel */
 export type SyncMsg =
   | { type: 'state'; idx: number; step: number; startedAt: number }
-  | { type: 'cmd'; action: 'next' | 'prev' | 'goto' | 'reset'; idx?: number }
+  | { type: 'cmd'; action: 'next' | 'prev' | 'goto' | 'reset' | 'resetTimer'; idx?: number }
   | { type: 'hello' }
 
 export const channel: BroadcastChannel | null = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('orbit-pitch') : null
