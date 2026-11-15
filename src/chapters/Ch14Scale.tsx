@@ -1,6 +1,6 @@
-import { ChevronRight } from 'lucide-react'
-import { ChapterHeader, Expandable, LearningCard, Reveal, SourceNote, Stage, StageLabel } from '../components/ui'
-import { ExternalBranch, PhaseCard } from '../components/verdict/Roadmap'
+import { motion } from 'framer-motion'
+import { ChapterHeader, Expandable, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { BranchPresent, ExternalBranch, PhaseCard, RoadmapPath } from '../components/verdict/Roadmap'
 import { chapters } from '../data/chapters'
 import { finYears, gbp, modelLabel } from '../data/financials'
 import { phases } from '../data/roadmap'
@@ -16,28 +16,36 @@ export default function Ch14Scale({ mode, step }: ChapterProps) {
 
   return (
     <Stage mode={mode} className={present ? 'sm:py-[68px]!' : ''}>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <StageLabel stage={meta.stage} />
-      </div>
-      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
-
-      <div className={`mt-6 grid gap-3 sm:grid-cols-2 ${compact ? 'lg:grid-cols-4' : 'lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]'} lg:gap-x-2 lg:gap-y-3`}>
-        {phases.map((p, i) => (
-          <PhaseSlot key={p.id} i={i} s={s} compact={compact} />
-        ))}
-      </div>
-
-      {(!present || s >= 4) && (
-        <div className={compact ? 'mt-4' : 'mt-6'}>
-          <ExternalBranch show={s >= 4} compact={compact} />
+      <motion.div layout="position" transition={{ duration: 0.7, ease }}>
+        <div className="mb-3 flex flex-wrap items-center gap-3">
+          <StageLabel stage={meta.stage} />
         </div>
-      )}
+        <ChapterHeader num={meta.num} kicker={meta.title} title="Growth should be *earned, not assumed.*" />
+      </motion.div>
+
+      <motion.div layout="position" transition={{ duration: 0.7, ease }} className={compact ? 'mt-5' : 'mt-12'}>
+        <RoadmapPath s={s} compact={compact} />
+      </motion.div>
+
+      {present && s >= 4 && <BranchPresent show />}
 
       <div className="mt-4">
-        <SourceNote>
-          {modelLabel} Customer counts are modelled targets from financial model V3 (S5) — not achieved results, and no university other than Imperial is a customer or partner. Gates are PROPOSED decision criteria.
-        </SourceNote>
+        <SourceNote>{present ? 'Modelled targets, not achieved (S5). Gates are proposed. Hover a lock for its criteria.' : `${modelLabel} Customer counts are modelled targets from financial model V3 (S5) — not achieved results, and no university other than Imperial is a customer or partner. Gates are PROPOSED decision criteria.`}</SourceNote>
       </div>
+
+      {!present && (
+        <div className="mt-8">
+          <h3 className="t-kicker mb-3">Phases and gate criteria</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {phases.map((p) => (
+              <PhaseCard key={p.id} phase={p} show compact={false} />
+            ))}
+          </div>
+          <div className="mt-8">
+            <ExternalBranch show />
+          </div>
+        </div>
+      )}
 
       {!present && (
         <div className="mt-8 space-y-3">
@@ -91,23 +99,5 @@ export default function Ch14Scale({ mode, step }: ChapterProps) {
         </Reveal>
       )}
     </Stage>
-  )
-}
-
-/** Grid slot: a phase card, followed (on wide screens) by a gate connector chevron. */
-function PhaseSlot({ i, s, compact }: { i: number; s: number; compact: boolean }) {
-  const p = phases[i]
-  const show = s >= p.step
-  return (
-    <>
-      <PhaseCard phase={p} show={show} compact={compact} />
-      {i < phases.length - 1 && !compact && (
-        <div className="hidden items-center justify-center lg:flex" aria-hidden>
-          <Reveal show={s >= phases[i + 1].step} className="text-ev-proposed">
-            <ChevronRight size={22} />
-          </Reveal>
-        </div>
-      )}
-    </>
   )
 }

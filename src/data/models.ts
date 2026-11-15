@@ -19,6 +19,11 @@ export interface RevenueModel {
   next: string
   /** step-3 verdict */
   verdict: string
+  /** present-mode short forms */
+  short: string
+  payerShort: string
+  uncertaintyShort: string
+  verdictShort: string
 }
 
 export const revenueModels: RevenueModel[] = [
@@ -35,6 +40,10 @@ export const revenueModels: RevenueModel[] = [
     unknown: 'Will an institution pay for an additional subscription, and renew it at a viable price?',
     next: 'One paid, measurable university pilot with success measures agreed in advance.',
     verdict: 'Working hypothesis',
+    short: 'University SaaS',
+    payerShort: 'The university',
+    uncertaintyShort: 'Will an institution pay, and renew?',
+    verdictShort: 'Working hypothesis',
   },
   {
     id: 'B',
@@ -48,6 +57,10 @@ export const revenueModels: RevenueModel[] = [
     unknown: 'Is there enough paid-event volume, reliable attribution and commission margin?',
     next: 'Separate test of paid-event volume, attribution feasibility and commission terms.',
     verdict: 'Future opportunity requiring its own validation',
+    short: 'Organiser referrals',
+    payerShort: 'Organisers or platforms',
+    uncertaintyShort: 'Is there enough paid-event volume?',
+    verdictShort: 'Own test, later',
   },
   {
     id: 'C',
@@ -61,5 +74,9 @@ export const revenueModels: RevenueModel[] = [
     unknown: 'Will students pay for opportunities that are often free to discover elsewhere?',
     next: 'Not prioritised. Would need its own willingness-to-pay test.',
     verdict: 'Lower priority',
+    short: 'Student subscription',
+    payerShort: 'The student',
+    uncertaintyShort: 'Will students pay for what is free elsewhere?',
+    verdictShort: 'Lower priority',
   },
 ]

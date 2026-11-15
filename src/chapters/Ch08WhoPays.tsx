@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { PathCard, type PathDetail, type PathState } from '../components/bmd/PathCard'
-import { ChapterHeader, EvidenceTag, Expandable, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { PathConnectors, PathNode, verdictStates } from '../components/bmd/PathNode'
+import { ChapterHeader, EvidenceTag, Expandable, LearningCard, LearningStrip, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import type { Learning } from '../data/evidence'
@@ -54,7 +55,10 @@ function Cell({ children, hl = false }: { children: React.ReactNode; hl?: boolea
 }
 
 function CompareTable({ compact = false }: { compact?: boolean }) {
-  const rows: { label: string; key: 'payer' | 'source' | 'evidence' | 'costs' | 'unknown' | 'next' }[] = [
+  const rows: {
+    label: string
+    key: 'payer' | 'source' | 'evidence' | 'costs' | 'unknown' | 'next'
+  }[] = [
     { label: 'Paying customer', key: 'payer' },
     { label: 'Source of value', key: 'source' },
     { label: 'Purchasing evidence', key: 'evidence' },
@@ -124,7 +128,8 @@ function Decision({ show }: { show: boolean }) {
   return (
     <Reveal show={show} className="max-w-5xl">
       <p className="text-[clamp(1.05rem,1.55vw,1.5rem)] font-medium leading-snug text-snow">
-        We selected the university-funded model as our core hypothesis because it connects the institutional value proposition with a potentially recurring source of revenue while retaining free student access.
+        We selected the university-funded model as our core hypothesis because it connects the institutional value proposition with a potentially recurring source of revenue while retaining free
+        student access.
       </p>
       <p className="mt-2.5 flex items-center gap-2 text-base text-amber">
         <span className="h-1.5 w-1.5 rounded-full bg-amber" /> We have not yet proven this is the winning business model.
@@ -198,7 +203,8 @@ export default function Ch08WhoPays({ mode, step }: ChapterProps) {
               </table>
             </div>
             <p className="mt-3">
-              Totals multiply institutions in each size band (HESA 2024/25, S7) by the proposed price, as a ceiling on the opportunity, not forecast revenue. The prices are proposals; no institution has been asked to confirm them.
+              Totals multiply institutions in each size band (HESA 2024/25, S7) by the proposed price, as a ceiling on the opportunity, not forecast revenue. The prices are proposals; no institution
+              has been asked to confirm them.
             </p>
           </Expandable>
         </div>
@@ -208,40 +214,75 @@ export default function Ch08WhoPays({ mode, step }: ChapterProps) {
   }
 
   /* ---------------- Present ---------------- */
+  const verdict = step === 3
+  const states: PathState[] = revenueModels.map((m) => (verdict ? verdictStates[m.id] : 'normal'))
   return (
-    <Stage mode={mode} className="sm:!pb-[64px] sm:!pt-[72px]">
-      <div className="flex flex-col gap-5">
+    <Stage mode={mode} className="sm:!justify-start sm:!pb-[56px] sm:!pt-[76px]">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div>{header}</div>
+        <div className={`flex flex-1 flex-col ${verdict ? 'justify-start' : 'justify-center pb-8'}`}>
+          {step === 0 && (
+            <div className="mt-10 flex flex-col items-center gap-10">
+              <div className="relative w-full">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[220%] w-[60%] -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    background: 'radial-gradient(closest-side, rgba(139,92,246,0.32), transparent 70%)',
+                  }}
+                />
+                <div className="relative scale-[1.12] py-2">
+                  <Root compact={false} />
+                </div>
+              </div>
+              <p className="text-center text-[clamp(2rem,4.2vw,3.8rem)] font-semibold leading-tight tracking-[-0.025em] text-snow">
+                <SplitHeadline text="Students would use it. *Who would pay?*" />
+              </p>
+            </div>
+          )}
 
-        {step === 0 && (
-          <>
-            <Root compact={false} />
-            <Reveal show className="text-center">
-              <p className="t-lead">Students would use it. The open question is who would pay for it.</p>
-            </Reveal>
-          </>
-        )}
+          {(step === 1 || step === 3) && (
+            <div className="flex flex-col gap-1">
+              <div className={verdict ? '' : 'mt-3'}>
+                <Root compact />
+              </div>
+              <PathConnectors show states={states} />
+              <div className="grid items-stretch gap-5 lg:grid-cols-3">
+                {revenueModels.map((m, i) => (
+                  <PathNode key={m.id} m={m} index={i} variant={verdict ? 'verdict' : 'detail'} state={states[i]} size={verdict ? 'md' : 'lg'} />
+                ))}
+              </div>
+            </div>
+          )}
 
-        {(step === 1 || step === 3) && (
-          <div>
-            {step === 1 && <Root compact />}
-            <Branches resolved={step === 3} lean={step === 3} show />
-          </div>
-        )}
+          {step === 2 && (
+            <div className="mt-4 flex flex-col gap-12">
+              <p className="mt-2 text-center text-[clamp(2rem,4.2vw,3.8rem)] font-semibold leading-[1.05] tracking-[-0.025em] text-snow">
+                <SplitHeadline text="None has purchasing *evidence yet.*" />
+              </p>
+              <div className="grid items-stretch gap-5 lg:grid-cols-3">
+                {revenueModels.map((m, i) => (
+                  <PathNode key={m.id} m={m} index={i} variant="evidence" state="normal" />
+                ))}
+              </div>
+              <SourceNote>Qualitative comparison. No scores shown: none of the three has purchasing evidence yet.</SourceNote>
+            </div>
+          )}
 
-        {step === 2 && (
-          <>
-            <CompareTable compact />
-            <SourceNote>Qualitative comparison. No scores are shown: none of the three has purchasing evidence yet.</SourceNote>
-          </>
-        )}
-
-        {step === 3 && (
-          <>
-            <Decision show />
-            <LearningCard learning={learning} compact />
-          </>
-        )}
+          {verdict && (
+            <div className="mt-4 flex flex-col gap-3">
+              <Reveal show>
+                <p className="text-[clamp(1.5rem,2.8vw,2.4rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
+                  <SplitHeadline text="University-funded is our *working hypothesis.*" />
+                </p>
+                <p className="mt-1.5 flex items-center gap-2 text-base text-amber">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber" /> Not yet proven as the winning model.
+                </p>
+              </Reveal>
+              <LearningStrip believed="Several ways to monetise at once." learned="None has purchasing evidence yet." changed="University SaaS is the working hypothesis." />
+            </div>
+          )}
+        </div>
       </div>
     </Stage>
   )

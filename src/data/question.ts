@@ -39,3 +39,7 @@ export const scenarioLabel = 'Illustrative reconstruction — not a recording of
 export const freezeQuestion = 'What if the problem is not a lack of opportunities, but how students discover them?'
 export const centralQuestion = 'Why are students missing opportunities that already exist?'
 export const orbitSubtitle = 'A New Venture Creation journey from observation to evidence.'
+
+/** Present-mode (short) variants — the full strings above stay in Explore. */
+export const scenarioShort = 'Illustrative reconstruction'
+export const freezeShort = 'What if the problem isn’t *opportunities* — but *discovery?*'

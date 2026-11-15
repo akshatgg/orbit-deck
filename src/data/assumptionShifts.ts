@@ -15,6 +15,8 @@ export interface AssumptionShift {
   hypothesis: string
   evidence: string
   decision: string
+  /** Present-mode phrasings (≤ 12 words each). Full wording above is kept for Explore. */
+  p: { believed: string; evidence: string; decision: string }
 }
 
 export const assumptionShifts: AssumptionShift[] = [
@@ -24,6 +26,7 @@ export const assumptionShifts: AssumptionShift[] = [
     hypothesis: 'Students need one more event app.',
     evidence: `${wary} interviewees were wary of adopting another system.`,
     decision: 'Orbit must reduce effort rather than create another task.',
+    p: { believed: 'Students need one more event app.', evidence: `${wary} of 13 interviewees wary of another system.`, decision: 'Reduce effort. Do not add a task.' },
   },
   {
     n: 2,
@@ -31,6 +34,7 @@ export const assumptionShifts: AssumptionShift[] = [
     hypothesis: 'Public event-platform aggregation could be enough.',
     evidence: 'University email, peers and social channels were more commonly reported than Luma or Fatsoma.',
     decision: 'Prioritise authorised university-event coverage and relevant sources.',
+    p: { believed: 'Public-platform aggregation is enough.', evidence: 'Email, peers and social beat Luma and Fatsoma.', decision: 'Prioritise authorised university-event coverage.' },
   },
   {
     n: 3,
@@ -38,6 +42,7 @@ export const assumptionShifts: AssumptionShift[] = [
     hypothesis: 'Reminders could prevent missed events.',
     evidence: `Only ${forgot} survey respondents identified forgetting as the main reason for their latest miss; ${discoveryRelatedMisses} cited late discovery, deadlines or full events.`,
     decision: 'Make timely discovery the core value proposition; keep reminders secondary.',
+    p: { believed: 'Reminders will prevent missed events.', evidence: `Forgot: ${forgot} of 42. Discovery-related: ${discoveryRelatedMisses} of 42.`, decision: 'Timely discovery is core. Reminders are secondary.' },
   },
   {
     n: 4,
@@ -45,6 +50,7 @@ export const assumptionShifts: AssumptionShift[] = [
     hypothesis: 'Better discovery solves the missed-event problem.',
     evidence: `${clash} respondents reported timetable clashes.`,
     decision: 'Availability filters may help, but Orbit cannot eliminate conflicting commitments.',
+    p: { believed: 'Better discovery solves missed events.', evidence: `${clash} of 42 missed events through timetable clashes.`, decision: 'Filters may help. Orbit cannot remove clashes.' },
   },
   {
     n: 5,
@@ -52,6 +58,7 @@ export const assumptionShifts: AssumptionShift[] = [
     hypothesis: 'Students experiencing fragmentation will adopt Orbit.',
     evidence: 'Existing workarounds are familiar and some interviewees reported little difficulty.',
     decision: 'Measure switching behaviour and weekly return use rather than assume adoption.',
+    p: { believed: 'Fragmentation means students will adopt Orbit.', evidence: 'Workarounds are familiar; some reported little difficulty.', decision: 'Measure switching and weekly return. Do not assume.' },
   },
 ]
 

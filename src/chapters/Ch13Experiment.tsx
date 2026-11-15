@@ -4,9 +4,12 @@ import CohortCalculator from '../components/validation/CohortCalculator'
 import PilotSequence from '../components/validation/PilotSequence'
 import { AttendanceCalc, ClickLadder, Gates } from '../components/validation/PilotScorecard'
 import VerdictSimulator from '../components/validation/VerdictSimulator'
-import { ChapterHeader, EvidenceTag, Expandable, LearningCard, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
+import { FunnelHero, GateTiles, MiniSimulator, PilotTrack } from '../components/validation/PitchPilot'
+import { Hero, PresentHeader } from '../components/validation/PitchKit'
+import { Accent, ChapterHeader, EvidenceTag, Expandable, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { defaultInvited, evaluationIncludes, pilotDisclaimer, pilotEndLine, pilotLearning } from '../data/pilot'
+import { pilotPresent as P, pilotStrip } from '../data/validationPresent'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'experiment')!
@@ -96,52 +99,60 @@ export default function Ch13Experiment({ mode, step }: ChapterProps) {
     )
   }
 
-  const title = <SplitHeadline text={meta.headline} className="t-h2 block" />
+  const banner = <EvidenceTag label="proposed" text={P.banner} />
   return (
     <Stage mode="present">
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={title} />
-      <div className="mt-5">
+      <PresentHeader stage={meta.stage} num={meta.num} kicker={meta.title} title="What evidence would make us *pursue Orbit?*" banner={banner} />
+      <div className="mt-6 min-h-[25rem]">
         <AnimatePresence mode="wait" initial={false}>
           {step === 0 && (
             <Slide key="seq" k="seq">
-              <Lead />
-              <div className="mb-5 mt-4">
-                <Disclaimer large />
-              </div>
-              <PilotSequence />
+              <Hero size="lg" className="mb-14">
+                {P.step0Lead} <Accent>{P.step0Accent}</Accent> {P.step0Tail}
+              </Hero>
+              <PilotTrack />
             </Slide>
           )}
           {step === 1 && (
             <Slide key="calc" k="calc">
-              <div className="mb-4">
-                <Disclaimer />
-              </div>
-              <CohortCalculator invited={invited} setInvited={setInvited} />
+              <Hero className="mb-6">
+                {P.step1Lead} <Accent>{P.step1Accent}</Accent> {P.step1Tail}
+              </Hero>
+              <FunnelHero invited={invited} setInvited={setInvited} />
+              <p className="mt-3 font-mono text-[11px] text-dim">{P.step1Note}</p>
             </Slide>
           )}
           {step === 2 && (
             <Slide key="score" k="score">
-              <div className="mb-4">
-                <Disclaimer />
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <Hero>
+                  {P.step2Lead} <Accent>{P.step2Accent}</Accent>
+                </Hero>
+                <span className="rounded-full border border-amber/50 bg-amber/10 px-3.5 py-1 text-[15px] text-amber">{P.step2Chip}</span>
               </div>
-              <Scorecard />
+              <GateTiles />
             </Slide>
           )}
           {step === 3 && (
             <Slide key="sim" k="sim">
-              <VerdictSimulator />
+              <MiniSimulator />
             </Slide>
           )}
           {step >= 4 && (
             <Slide key="end" k="end">
-              <p className="max-w-5xl font-serif text-[clamp(2.2rem,5.2vw,5.6rem)] italic leading-[1.04] text-snow">{pilotEndLine}</p>
-              <LearningCard className="mt-8" compact learning={pilotLearning} />
+              <Hero size="xl" className="max-w-5xl font-normal">
+                {P.endLead} <Accent>{P.endAccent}</Accent>
+              </Hero>
+              <Reveal delay={0.4} className="mt-8">
+                <LearningStrip {...pilotStrip} />
+              </Reveal>
             </Slide>
           )}
         </AnimatePresence>
       </div>
-      <div className="mt-3">{source}</div>
+      <div className="mt-3">
+        <SourceNote>{P.source}</SourceNote>
+      </div>
     </Stage>
   )
 }

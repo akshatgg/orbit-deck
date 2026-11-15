@@ -1,11 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { ArchitectureDiagram, MvpBoundary, mvpEndLine } from '../components/bmd/ProductDiagrams'
+import { ArchitectureDiagram, FlowPipeline, MvpBoundary, MvpChips, mvpEndLine } from '../components/bmd/ProductDiagrams'
 import { DemoSideControls, OrbitDemoPhone, PhoneShell } from '../components/bmd/OrbitDemoPhone'
+import { PhoneHero } from '../components/bmd/PhoneHero'
 import { useOrbitDemo } from '../components/bmd/useOrbitDemo'
 import { VideoPanel } from '../components/bmd/VideoPanel'
-import { Button, ChapterHeader, EvidenceTag, Expandable, IllustrativeBadge, LearningCard, Reveal, SourceNote, Stage, StageLabel } from '../components/ui'
+import { Button, ChapterHeader, EvidenceTag, Expandable, IllustrativeBadge, LearningCard, LearningStrip, Reveal, SourceNote, SplitHeadline, Stage, StageLabel } from '../components/ui'
+import { topics } from '../data/demoEvents'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import type { Learning } from '../data/evidence'
@@ -25,7 +27,12 @@ type View = 'walk' | 'video'
 function ViewToggle({ view, setView }: { view: View; setView: (v: View) => void }) {
   return (
     <div className="inline-flex rounded-full border border-line p-1" role="tablist" aria-label="Product view">
-      {([['walk', 'Interactive walkthrough'], ['video', 'Video']] as const).map(([id, label]) => (
+      {(
+        [
+          ['walk', 'Interactive walkthrough'],
+          ['video', 'Video'],
+        ] as const
+      ).map(([id, label]) => (
         <button
           key={id}
           type="button"
@@ -100,13 +107,19 @@ export default function Ch07Product({ mode, step }: ChapterProps) {
           <PrototypeLink />
         </div>
         <div className="mt-8 grid gap-10 lg:grid-cols-[auto_1fr] lg:items-start">
-          {view === 'walk' ? <div className="mx-auto lg:mx-0">{phone}</div> : <div className="w-full lg:w-[560px]"><VideoPanel /></div>}
+          {view === 'walk' ? (
+            <div className="mx-auto lg:mx-0">{phone}</div>
+          ) : (
+            <div className="w-full lg:w-[560px]">
+              <VideoPanel />
+            </div>
+          )}
           <div className="flex flex-col gap-6">
             <DemoSideControls d={d} />
             <Expandable title="How relevance is scored in this demo">
               <p>
-                A transparent rule, not a model: +3 for each topic you chose that the event carries, +2 if its format is one you chose, +2 if it falls in a window you said you are free. 3 or more shows as a good match,
-                6 or more as a strong match. All events and sources are fictional samples.
+                A transparent rule, not a model: +3 for each topic you chose that the event carries, +2 if its format is one you chose, +2 if it falls in a window you said you are free. 3 or more
+                shows as a good match, 6 or more as a strong match. All events and sources are fictional samples.
               </p>
             </Expandable>
             <Expandable title="Prototype walkthrough testing: in progress">
@@ -152,42 +165,69 @@ export default function Ch07Product({ mode, step }: ChapterProps) {
 
   /* ---------------- Present ---------------- */
   const showPhone = step <= 1
+  const heroPhone = (
+    <PhoneHero caption={<IllustrativeBadge label="Sample data" />}>
+      <PhoneShell style={{ width: 'min(calc((100vh - 200px) / 2.05), 400px)' }}>
+        <OrbitDemoPhone d={d} />
+      </PhoneShell>
+    </PhoneHero>
+  )
   return (
-    <Stage mode={mode}>
+    <Stage mode={mode} className={`sm:!pb-[56px] ${showPhone ? 'sm:!pt-[64px]' : 'sm:!justify-start sm:!pt-[92px]'}`}>
       {showPhone ? (
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-14">
-          <div className="flex flex-col gap-5">
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
+          <div className="flex flex-col gap-6">
             {header}
-            <Reveal show className="max-w-xl text-silver">
-              <p className="t-lead !text-[1.15rem]">
-                {step === 0
-                  ? 'Set it up the way a student would: university, interests, event formats, then when you are free.'
-                  : 'Search, filter, save, switch between university and London views, and open an event to see its source. Or retune the feed from here.'}
-              </p>
+            <Reveal show className="max-w-xl">
+              <p className="t-lead !text-[1.2rem]">{step === 0 ? 'Set it up like a student would.' : 'Tap an interest. The feed re-ranks.'}</p>
             </Reveal>
-            <div className="flex flex-wrap items-center gap-4">
-              <ViewToggle view={view} setView={setView} />
+            <div className="flex max-w-2xl flex-wrap gap-2.5" role="group" aria-label="Interests">
+              {topics.map((t) => {
+                const on = d.prefs.topics.includes(t)
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      d.toggleTopic(t)
+                    }}
+                    className={`rounded-full border px-4 py-2 text-base font-medium transition-all ${on ? 'border-violet bg-violet/25 text-snow shadow-[0_0_24px_-4px_rgba(139,92,246,0.8)]' : 'border-line text-silver hover:border-violet/50 hover:text-snow'}`}
+                  >
+                    {t}
+                  </button>
+                )
+              })}
             </div>
-            {step === 1 && <DemoSideControls d={d} compact />}
-            <PrototypeLink />
           </div>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={view} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="mx-auto">
-              {view === 'walk' ? phone : <div className="w-[min(560px,90vw)]"><VideoPanel /></div>}
-            </motion.div>
-          </AnimatePresence>
+          <div className="mx-auto px-6">{heroPhone}</div>
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-6">
           <div>{header}</div>
-          {step === 2 && <ArchitectureDiagram />}
-          {step === 3 && (
-            <>
-              <MvpBoundary />
-              <p className="max-w-5xl text-[clamp(1.1rem,1.8vw,1.6rem)] font-medium leading-snug text-snow">{mvpEndLine}</p>
-              <LearningCard learning={learning} compact />
-            </>
-          )}
+          <div className="flex flex-1 flex-col justify-center gap-9 pb-8">
+            {step === 2 && (
+              <>
+                <p className="text-[clamp(1.6rem,3vw,2.6rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
+                  <SplitHeadline text="Orbit is a *discovery layer.* Not a replacement." />
+                </p>
+                <FlowPipeline />
+                <div className="flex flex-wrap items-center gap-3">
+                  <EvidenceTag label="proposed" text="Design, no live integrations" />
+                </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <p className="text-[clamp(1.6rem,3vw,2.6rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
+                  <SplitHeadline text="Test discovery. *Not feature count.*" />
+                </p>
+                <MvpChips />
+                <LearningStrip believed="More features, more useful." learned="Coverage, relevance, source trust matter most." changed="Narrow MVP; social features parked." />
+              </>
+            )}
+          </div>
         </div>
       )}
     </Stage>

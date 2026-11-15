@@ -1,8 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { ChannelChart } from '../components/discovery/ChannelChart'
 import { DotField, type DotView } from '../components/discovery/DotField'
-import { ChapterHeader, EvidenceTag, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { PresentHeader } from '../components/discovery/pitch'
+import { Accent, ChapterHeader, EvidenceTag, GlowNumber, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { causesCaveat, findingLabels, insightShort, learningStripCh04 } from '../data/discoveryShort'
 import { chapters } from '../data/chapters'
 import type { Learning } from '../data/evidence'
 import { discoveryRelatedMisses, headlineFindings, interviewN, keyInsight, missCausesListedTotal, quotes, surveyN } from '../data/research'
@@ -72,6 +75,55 @@ function ViewPanel({ view }: { view: DotView }) {
         </div>
       )}
       <EvidenceTag label="observed" />
+    </div>
+  )
+}
+
+/** Present-mode hero stat: big glowing number beside the dot field, one short label. */
+function StatPanel({ view }: { view: DotView }) {
+  const stat =
+    view === 'all' ? { value: surveyN, of: null, label: findingLabels.all }
+    : view === 'missed' ? { value: fMissed.value, of: fMissed.of, label: findingLabels.missed }
+    : view === 'toomany' ? { value: fToomany.value, of: fToomany.of, label: findingLabels.toomany }
+    : view === 'interview' ? { value: fInterview.value, of: fInterview.of, label: findingLabels.interview }
+    : { value: discoveryRelatedMisses, of: surveyN, label: findingLabels.causes }
+  return (
+    <div>
+      <GlowNumber
+        value={stat.value}
+        className="text-[clamp(5.5rem,11vw,10rem)] leading-[0.9]"
+        suffix={stat.of ? <span className="num text-[clamp(1.75rem,3.2vw,3rem)] text-silver">of {stat.of}</span> : undefined}
+      />
+      <p className="mt-3 max-w-md text-[clamp(1.25rem,2vw,1.9rem)] leading-snug text-snow">{stat.label}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <EvidenceTag label="observed" />
+        {view === 'interview' && <span className="text-sm text-silver">Interviews, not the survey</span>}
+      </div>
+      {view === 'causes' && <p className="mt-4 max-w-md border-l-2 border-ev-unresolved pl-3 text-base leading-snug text-silver">{causesCaveat}</p>}
+    </div>
+  )
+}
+
+/** One large serif quote at a time, with a small pager. */
+function QuoteStage() {
+  const [i, setI] = useState(0)
+  const n = quotes.length
+  return (
+    <div className="flex flex-col justify-center">
+      <div className="font-serif text-[5rem] leading-[0.6] text-violet" aria-hidden>“</div>
+      <div className="min-h-[clamp(9rem,26vh,13rem)]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.figure key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }}>
+            <blockquote className="font-serif text-[clamp(1.9rem,3.3vw,3.2rem)] italic leading-[1.1] text-snow">{quotes[i].text}</blockquote>
+            <figcaption className="mt-3 flex items-center gap-3 text-sm text-silver">Interviewee, anonymised <EvidenceTag label="observed" /></figcaption>
+          </motion.figure>
+        </AnimatePresence>
+      </div>
+      <div className="mt-3 flex items-center gap-2" role="group" aria-label="Interview quotes">
+        <button type="button" aria-label="Previous quote" onClick={(e) => { e.stopPropagation(); setI((i + n - 1) % n) }} className="rounded-full border border-line p-2 text-silver hover:text-snow"><ChevronLeft size={16} /></button>
+        <span className="num text-sm text-silver">{i + 1} / {n}</span>
+        <button type="button" aria-label="Next quote" onClick={(e) => { e.stopPropagation(); setI((i + 1) % n) }} className="rounded-full border border-line p-2 text-silver hover:text-snow"><ChevronRight size={16} /></button>
+      </div>
     </div>
   )
 }
@@ -154,48 +206,55 @@ export default function Ch04WhatStudentsToldUs({ mode, step }: ChapterProps) {
   }
 
   return (
-    <Stage mode={mode}>
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
+    <Stage mode={mode} className="!justify-start !pb-8 !pt-20">
+      <PresentHeader meta={meta} title="The problem was real. *But it was not exactly what we expected.*" />
 
-      <div className="mt-5">
+      <div className="mt-4">
         <AnimatePresence mode="wait" initial={false}>
           {step <= 4 && (
-            <motion.div key="dots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease }} className="grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
+            <motion.div key="dots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease }} className="grid items-center gap-6 lg:grid-cols-[1.25fr_1fr] lg:gap-10">
               <div>
-                <div className="glass rounded-2xl p-4">
-                  <DotField view={viewOfStep[step]} />
+                <div className="glass rounded-2xl p-3">
+                  <DotField view={viewOfStep[step]} tall />
                 </div>
-                <SourceNote className="mt-2">S3, S4 · {DOT_NOTE}</SourceNote>
+                <SourceNote className="mt-2">S3, S4 · Dot layout is illustrative: counts, not overlap.</SourceNote>
               </div>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={viewOfStep[step]} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}>
-                  <ViewPanel view={viewOfStep[step]} />
+                  <StatPanel view={viewOfStep[step]} />
                 </motion.div>
               </AnimatePresence>
             </motion.div>
           )}
           {step === 5 && (
             <motion.div key="chan" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease }}>
-              <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+              <p className="mb-3 text-[clamp(1.4rem,2.4vw,2.2rem)] font-medium leading-tight tracking-tight text-snow">
+                Students hear from <Accent>friends and email</Accent>, not event apps.
+              </p>
+              <div className="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:gap-12">
                 <div>
-                  <div className="mb-2 flex items-center gap-3">
-                    <span className="t-kicker !text-[11px]">How students hear about events</span>
+                  <div className="mb-1 flex items-center gap-3">
+                    <span className="t-kicker !text-[11px]">How students hear · survey n = {surveyN}</span>
                     <EvidenceTag label="observed" />
                   </div>
-                  <ChannelChart />
+                  <ChannelChart compact />
                 </div>
-                <Quotes />
+                <QuoteStage />
               </div>
-              <SourceNote className="mt-3">S3, S4 · Survey n = {surveyN}; quotes from the interviews (n = {interviewN}).</SourceNote>
+              <SourceNote className="mt-2">S3, S4 · Quotes from the interviews (n = {interviewN}).</SourceNote>
             </motion.div>
           )}
           {step === 6 && (
-            <motion.div key="insight" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="space-y-6">
-              <div className="t-kicker">Key insight</div>
-              <Insight large />
-              <Reveal show delay={0.3}>
-                <LearningCard learning={learning} compact />
+            <motion.div key="insight" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="space-y-8 pt-6">
+              <div className="flex items-center gap-3">
+                <span className="t-kicker">Key insight</span>
+                <EvidenceTag label="observed" />
+              </div>
+              <p className="max-w-5xl text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[1.02] tracking-tight text-snow">
+                {insightShort.lead} <Accent>{insightShort.accent}</Accent>
+              </p>
+              <Reveal show delay={0.35}>
+                <LearningStrip {...learningStripCh04} />
               </Reveal>
             </motion.div>
           )}

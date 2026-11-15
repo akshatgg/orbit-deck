@@ -46,3 +46,17 @@ export const originLearning = {
   learned: 'We needed evidence beyond our own experience.',
   changed: 'Next decision: screen the opportunity before investing significant resources.',
 }
+
+/** Present-mode (short) variants — the full strings above stay in Explore. */
+export const originLead = 'It began in our own inboxes.'
+export const originShort = {
+  observation: 'Events are scattered across channels.',
+  problem: 'Students may miss events because discovery is fragmented.',
+  opportunity: 'One discovery layer might help.',
+} as const
+export const caveatShort = 'A starting point — not proof of a market.'
+export const originStrip = {
+  believed: 'Our problem is shared',
+  learned: 'We need evidence beyond ourselves',
+  changed: 'Screen the opportunity first',
+}

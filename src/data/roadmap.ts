@@ -11,6 +11,12 @@ export interface Phase {
   id: string
   years: string
   title: string
+  /** One short line for Present mode. */
+  short: string
+  /** Short gate name for the lock label. */
+  gateShort?: string
+  /** Hero number for Present mode (modelled). */
+  big: { value: number; label: string }
   /** Presenter step at which this phase is revealed. */
   step: number
   actions: string[]
@@ -25,6 +31,9 @@ export interface Phase {
 export const phases: Phase[] = [
   {
     id: 'y1',
+    big: { value: inst(2027), label: 'universities' },
+    short: 'Pilot, paid renewal, reusable onboarding.',
+    gateShort: 'Is the model real?',
     years: 'Year 1',
     title: 'Prove the model',
     step: 0,
@@ -37,6 +46,9 @@ export const phases: Phase[] = [
   },
   {
     id: 'y2',
+    big: { value: inst(2028), label: 'universities' },
+    short: 'Repeat acquisition and deployment.',
+    gateShort: 'Can it be repeated?',
     years: 'Year 2',
     title: 'Establish repeatability',
     step: 1,
@@ -49,6 +61,9 @@ export const phases: Phase[] = [
   },
   {
     id: 'y3',
+    big: { value: inst(2029), label: 'universities' },
+    short: 'First positive EBITDA — modelled.',
+    gateShort: 'Does it pay for itself?',
     years: 'Year 3',
     title: 'Demonstrate commercial sustainability',
     step: 2,
@@ -62,6 +77,8 @@ export const phases: Phase[] = [
   },
   {
     id: 'y45',
+    big: { value: inst(2031), label: 'universities by Year 5' },
+    short: 'Standardise integrations across UK universities.',
     years: 'Years 4–5',
     title: 'Expand the university network',
     step: 3,
@@ -94,4 +111,12 @@ export const externalBranch = {
   notIncluded: 'External-event commissions are not included in the five-year university forecast.',
   independence: 'The university business can succeed while the external-events business fails, or vice versa.',
   condition: 'Pursue it only if its own evidence justifies it.',
+}
+
+/** Present-mode chips for the post-Year-5 branch (full lists stay in Explore). */
+export const branchChips = {
+  title: 'External city events',
+  advantages: ['Local event knowledge', 'Existing discovery layer', 'Possible organiser ties'],
+  risks: ['Users beyond universities', 'Organiser partnerships', 'Commission economics'],
+  line: 'One can succeed while the other fails.',
 }

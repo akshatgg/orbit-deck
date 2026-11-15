@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { RoleBadge, StakeholderMap } from '../components/bmd/StakeholderMap'
-import { Card, ChapterHeader, EvidenceTag, Expandable, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { RoleBadge, StakeholderMap, StakeholderOrbit } from '../components/bmd/StakeholderMap'
+import { Card, ChapterHeader, EvidenceTag, Expandable, LearningCard, LearningStrip, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import type { Learning } from '../data/evidence'
@@ -136,14 +136,14 @@ export default function Ch06Jtbd({ mode, step }: ChapterProps) {
         <div className="mt-12 flex flex-col gap-3">
           <Expandable title="How we applied the framework">
             <p>
-              Jobs-to-be-Done (Week 3, S2) asks what job a person hires a product to do, what they use today, and what outcome they want. We applied it to four parties rather than only the student, because the person who
-              uses Orbit, the party that might fund it and the people who can block it are not the same.
+              Jobs-to-be-Done (Week 3, S2) asks what job a person hires a product to do, what they use today, and what outcome they want. We applied it to four parties rather than only the student,
+              because the person who uses Orbit, the party that might fund it and the people who can block it are not the same.
             </p>
           </Expandable>
           <Expandable title="Evidence status of each job">
             <p>
-              The student job reflects our student research (survey n = 42, interviews n = 13). The university, organiser and IT/data-owner jobs are hypotheses framed from the framework: we are not claiming interviews or
-              commitments from those stakeholders.
+              The student job reflects our student research (survey n = 42, interviews n = 13). The university, organiser and IT/data-owner jobs are hypotheses framed from the framework: we are not
+              claiming interviews or commitments from those stakeholders.
             </p>
           </Expandable>
         </div>
@@ -155,39 +155,28 @@ export default function Ch06Jtbd({ mode, step }: ChapterProps) {
 
   /* ---------------- Present ---------------- */
   const final = step >= 5
+  const vp = pitchConfig.valueProposition
+  const vpText = vp.includes('early enough to act') ? vp.replace('early enough to act.', '*early enough to act.*') : vp
   return (
-    <Stage mode={mode} className="sm:!pb-[64px] sm:!pt-[72px]">
-      <div className="flex flex-col gap-5">
+    <Stage mode={mode} className="sm:!justify-start sm:!pb-[56px] sm:!pt-[76px]">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         <div>{header}</div>
-        <div className="grid items-center gap-6 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
-          {diagram(final ? 'h-[clamp(250px,36vh,400px)]' : 'h-[clamp(300px,50vh,560px)]')}
-          <div className="min-h-[200px]">
-            <AnimatePresence mode="wait" initial={false}>
-              {step === 0 && (
-                <motion.div key="intro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-                  <p className="t-lead">One product, four parties. Each would hire it for a different job.</p>
-                  <SourceNote className="mt-4">Jobs-to-be-Done framework, Week 3 (S2).</SourceNote>
-                </motion.div>
-              )}
-              {step >= 1 && step <= 4 && (
-                <motion.div key={sel.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-                  <JobPanel s={sel} showRole={false} />
-                </motion.div>
-              )}
-              {final && (
-                <motion.div key="roles" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <RoleCards compact />
-                </motion.div>
-              )}
-            </AnimatePresence>
+        <div className="flex flex-1 flex-col justify-center gap-3">
+          <StakeholderOrbit revealed={revealed} selected={final ? null : revealed ? selected : null} showRoles={showRoles} height={final ? 'clamp(220px,34vh,380px)' : 'clamp(270px,45vh,470px)'} />
+          <div className="flex min-h-[104px] flex-col items-center justify-start gap-3 text-center">
+            {step === 0 && <SplitHeadline text="One product. Four parties. *Four different jobs.*" className="t-h2 !text-[clamp(1.6rem,3vw,2.6rem)]" />}
+            {final && (
+              <>
+                <Reveal show>
+                  <p className="text-[clamp(1.7rem,3.3vw,3rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-snow">
+                    <SplitHeadline text={vpText} />
+                  </p>
+                </Reveal>
+                <LearningStrip believed="An app for students." learned="User, payer, gatekeeper are different parties." changed="Value: timely discovery for users, visibility for payers." />
+              </>
+            )}
           </div>
         </div>
-        {final && (
-          <>
-            <ValueProp show />
-            <LearningCard learning={learning} compact />
-          </>
-        )}
       </div>
     </Stage>
   )

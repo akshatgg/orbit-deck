@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { Button, ChapterHeader, Expandable, LearningCard, Logo, Reveal, SourceNote, Stage, StageLabel, StatusPill, ease } from '../components/ui'
-import { Finale, ThreeColumns, TrackerSummary, VerdictStamp, WhoPursues } from '../components/verdict/VerdictParts'
+import { AssumptionChips, Finale, FinaleCinematic, TeamRolesCompact, ThreeColumns, ThreeColumnsPunchy, TrackerSummary, VerdictHero, VerdictStamp, WhoPursues } from '../components/verdict/VerdictParts'
 import { assumptions } from '../data/assumptions'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
@@ -36,7 +36,7 @@ export default function Ch15Verdict({ mode, step }: ChapterProps) {
   // Present: later steps replace earlier content so every step fits one screen.
   const view = step <= 3 ? 'columns' : step === 4 ? 'verdict' : 'finale'
   return (
-    <Stage mode={mode} center={view === 'finale'}>
+    <Stage mode={mode} center={view !== 'columns'}>
       <AnimatePresence mode="wait" initial={false}>
         {view === 'columns' && (
           <motion.div key="columns" {...swap} className="w-full">
@@ -44,27 +44,23 @@ export default function Ch15Verdict({ mode, step }: ChapterProps) {
               <StageLabel stage={meta.stage} />
             </div>
             <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
-            <div className="mt-8">
-              <ThreeColumns s1={step >= 1} s2={step >= 2} s3={step >= 3} />
+            <div className="mt-6">
+              <ThreeColumnsPunchy s1={step >= 1} s2={step >= 2} s3={step >= 3} />
             </div>
           </motion.div>
         )}
         {view === 'verdict' && (
           <motion.div key="verdict" {...swap} className="w-full">
-            <div className="mb-2">
-              <StageLabel stage={meta.stage} />
-            </div>
-            <VerdictStamp show compact />
-            <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr_1fr]">
-              <WhoPursues show />
-              <TrackerSummary show />
+            <VerdictHero />
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <TeamRolesCompact />
+              <AssumptionChips />
             </div>
           </motion.div>
         )}
         {view === 'finale' && (
           <motion.div key="finale" {...swap} className="w-full">
-            <Finale openingQuestion={openingQuestion} closing={closing} />
-            <CallToAction />
+            <FinaleCinematic openingQuestion={openingQuestion} onEvidence={goEvidence} tagline={pitchConfig.tagline} />
           </motion.div>
         )}
       </AnimatePresence>

@@ -4,9 +4,12 @@ import EngagementMap from '../components/validation/EngagementMap'
 import EvidenceLadder from '../components/validation/EvidenceLadder'
 import ImperialJourney from '../components/validation/ImperialJourney'
 import PrototypeDrawer from '../components/validation/PrototypeDrawer'
-import { Card, ChapterHeader, EvidenceTag, LearningCard, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
+import { Hero, PresentHeader } from '../components/validation/PitchKit'
+import { JourneyPath, LadderViz, OrbitMap, UnknownChips } from '../components/validation/PitchEngagement'
+import { Accent, Card, ChapterHeader, EvidenceTag, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { engagementLearning, imperialContact, otherStudentAccounts, otherStudentDisclaimer, whatRemainsUnknown, whatWeLearned } from '../data/engagement'
+import { engagementShort, engagementStrip } from '../data/validationPresent'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'market-engagement')!
@@ -118,43 +121,70 @@ export default function Ch11MarketEngagement({ mode, step }: ChapterProps) {
     )
   }
 
-  const title = <SplitHeadline text={meta.headline} className="t-h2 block" />
   return (
     <Stage mode="present">
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={title} />
-      <div className="mt-6 min-h-0">
+      <PresentHeader stage={meta.stage} num={meta.num} kicker={meta.title} title="We took Orbit *beyond our own team.*" />
+      <div className="mt-5 min-h-[27.5rem]">
         <AnimatePresence mode="wait" initial={false}>
           {step <= 1 && (
             <Panel key="map">
-              <div className="grid items-center gap-6 lg:grid-cols-[1.35fr_1fr]">
+              <div className="grid items-center gap-6 lg:grid-cols-[1.45fr_1fr]">
                 <div>
-                  <EngagementMap showOthers={step >= 1} />
-                  <SourceNote className="mt-1">{mapNote}</SourceNote>
+                  <OrbitMap showOthers={step >= 1} />
                 </div>
-                {step === 0 ? <Happened /> : <OtherAccounts />}
+                <AnimatePresence mode="wait" initial={false}>
+                  {step === 0 ? (
+                    <motion.div key="s0" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease }} className="space-y-4">
+                      <Hero>
+                        One Imperial contact <Accent>welcomed the demonstration.</Accent>
+                      </Hero>
+                      <span className="inline-block rounded-full border border-amber/50 bg-amber/10 px-3.5 py-1 text-[15px] text-amber">{engagementShort.step0Tag}</span>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="s1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease }} className="space-y-4">
+                      <EvidenceTag label="observed" />
+                      <Hero>
+                        Same problem, <Accent>elsewhere.</Accent>
+                      </Hero>
+                      <p className="border-l-2 border-amber/70 pl-3 text-[clamp(1rem,1.25vw,1.2rem)] leading-snug text-snow">{engagementShort.step1Line}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+              {step >= 1 && <SourceNote className="mt-1">Not geographic · S3, S4</SourceNote>}
             </Panel>
           )}
           {step === 2 && (
             <Panel key="journey">
-              <ImperialJourney />
-              <div className="mt-4">
-                <LearnedUnknown />
+              <Hero className="mb-7">
+                Two happened. <Accent>The rest is open.</Accent>
+              </Hero>
+              <JourneyPath />
+              <div className="mt-8">
+                <UnknownChips />
               </div>
             </Panel>
           )}
           {step >= 3 && (
             <Panel key="ladder">
-              <EvidenceLadder />
-              <div className="mt-4">
-                <PrototypeDrawer />
+              <div className="grid items-center gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="space-y-4">
+                  <Hero size="lg">
+                    Three rungs lit. <Accent>Three still dark.</Accent>
+                  </Hero>
+                </div>
+                <LadderViz />
               </div>
-              <LearningCard className="mt-4" compact learning={engagementLearning} />
+              <LearningStrip className="mt-5" {...engagementStrip} />
             </Panel>
           )}
         </AnimatePresence>
       </div>
+      {step === 2 && (
+        <Reveal className="mt-3">
+          <SourceNote>Reported · S3, S4</SourceNote>
+        </Reveal>
+      )}
     </Stage>
   )
 }

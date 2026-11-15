@@ -1,8 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { AssumptionCard } from '../components/discovery/AssumptionCard'
+import { AssumptionCard, AssumptionCardShort } from '../components/discovery/AssumptionCard'
 import { FeatureCloud } from '../components/discovery/FeatureCloud'
-import { ChapterHeader, EvidenceTag, IllustrativeBadge, LearningCard, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { FeatureField } from '../components/discovery/FeatureField'
+import { PresentHeader } from '../components/discovery/pitch'
+import { Accent, ChapterHeader, EvidenceTag, IllustrativeBadge, LearningCard, LearningStrip, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { learningStripCh05 } from '../data/discoveryShort'
 import { assumptionClosing, assumptionShifts } from '../data/assumptionShifts'
 import { chapters } from '../data/chapters'
 import type { Learning } from '../data/evidence'
@@ -24,23 +27,27 @@ const CloudLabel = ({ children }: { children: string }) => (
   </div>
 )
 
-function CompactRow({ i, onPick }: { i: number; onPick: () => void }) {
-  const c = assumptionShifts[i]
+function BeliefChips({ upto, focus, onPick }: { upto: number; focus: number; onPick: (i: number) => void }) {
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation()
-        onPick()
-      }}
-      className="flex w-full items-center gap-3 rounded-xl border border-line bg-navy/60 px-3.5 py-2 text-left transition-colors hover:border-violet/50"
-      aria-label={`Reopen assumption ${c.n}: ${c.hypothesis}`}
-    >
-      <span className="num text-sm text-dim">{c.n}</span>
-      <span className="min-w-0 flex-1 truncate text-[15px] text-silver line-through decoration-st-contradicted/70">{c.hypothesis}</span>
-      <span className="text-dim" aria-hidden>→</span>
-      <span className="hidden min-w-0 flex-[1.3] truncate text-[15px] text-violet-soft sm:block">{c.decision}</span>
-    </button>
+    <ul className="flex flex-wrap gap-1.5" aria-label="Assumptions challenged so far">
+      {assumptionShifts.slice(0, upto).map((c, i) => (
+        <li key={c.n}>
+          <button
+            type="button"
+            aria-pressed={i === focus}
+            aria-label={`Show assumption ${c.n}: ${c.hypothesis}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onPick(i)
+            }}
+            className={`rounded-full border px-2.5 py-0.5 text-[13px] transition-colors ${i === focus ? 'border-st-contradicted/60 bg-st-contradicted/10 text-snow' : 'border-line text-dim hover:text-silver'}`}
+          >
+            <span className="num mr-1.5 text-xs">{c.n}</span>
+            <span className="line-through decoration-st-contradicted/70">{c.short}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -98,59 +105,42 @@ export default function Ch05AssumptionsChanged({ mode, step }: ChapterProps) {
   const closing = step === 6
 
   return (
-    <Stage mode={mode}>
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
+    <Stage mode={mode} className="!justify-start !pb-6 !pt-[72px]">
+      <PresentHeader meta={meta} title="The most valuable evidence was *the evidence that challenged us.*" />
 
-      <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start">
-        <div className={`w-full shrink-0 transition-[width] duration-700 ease-out ${step === 0 ? 'lg:w-full' : 'lg:w-[36%]'}`}>
-          <CloudLabel>Initial concept</CloudLabel>
-          <FeatureCloud resolved={resolved} showCore={closing} large={step === 0} />
-          {step === 0 && <p className="mt-4 text-center text-sm text-silver">Concept labels, not a historical feature list. Five assumptions are about to meet the evidence.</p>}
+      <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-center">
+        <div className={`w-full shrink-0 transition-[width] duration-[900ms] ease-out ${step === 0 ? 'lg:w-full' : 'lg:w-[52%]'}`}>
+          <CloudLabel>{closing ? 'Core proposition' : 'Initial concept'}</CloudLabel>
+          <FeatureField resolved={resolved} crystal={closing} large={step === 0} className={step === 0 ? 'h-[min(46vh,360px)]' : 'h-[min(48vh,370px)]'} />
+          {step === 0 && <p className="mt-3 text-center text-lg text-silver">12 concept labels. 5 assumptions about to be tested.</p>}
+          {step >= 1 && <SourceNote className="mt-2">S3, S4 · Analytical reconstruction, not dated pivots. Concept labels only.</SourceNote>}
         </div>
 
         {step >= 1 && !closing && (
-          <div className="min-w-0 flex-1 space-y-2">
-            {assumptionShifts.slice(0, step).map((c, i) =>
-              i === focus ? (
-                <motion.div key={`${c.n}-${step}-${focus}`} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }}>
-                  <AssumptionCard card={c} />
-                </motion.div>
-              ) : (
-                <CompactRow key={c.n} i={i} onPick={() => setPick({ step, idx: i })} />
-              ),
-            )}
+          <div className="min-w-0 flex-1 space-y-3">
+            <BeliefChips upto={step} focus={focus} onPick={(i) => setPick({ step, idx: i })} />
+            <motion.div key={`${assumptionShifts[focus].n}-${step}-${focus}`} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }}>
+              <AssumptionCardShort card={assumptionShifts[focus]} />
+            </motion.div>
           </div>
         )}
 
         <AnimatePresence>
           {closing && (
-            <motion.div key="close" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="min-w-0 flex-1 space-y-4">
-              <ul className="flex flex-wrap gap-2" aria-label="Five assumptions challenged">
-                {assumptionShifts.map((c) => (
-                  <li key={c.n} className="rounded-full border border-st-contradicted/30 bg-st-contradicted/5 px-3 py-1 text-sm text-silver">
-                    <span className="num mr-1.5 text-dim">{c.n}</span>
-                    <span className="line-through decoration-st-contradicted/70">{c.short}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[clamp(1.4rem,2.4vw,2.4rem)] font-medium leading-tight tracking-tight text-snow">{assumptionClosing.shift}</p>
-              <p className="font-serif text-[clamp(1.5rem,2.6vw,2.6rem)] italic text-violet-soft">{assumptionClosing.reframe}</p>
+            <motion.div key="close" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.5 }} className="min-w-0 flex-1 space-y-5">
+              <p className="text-[clamp(1.4rem,2.3vw,2.2rem)] font-medium leading-tight tracking-tight text-snow">From an all-in-one events app to a low-friction discovery layer.</p>
+              <p className="text-[clamp(2.4rem,4.4vw,4.4rem)] leading-[1.02]"><Accent>This is entrepreneurial learning.</Accent></p>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {closing && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-5">
-          <LearningCard learning={learning} compact />
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.9 }} className="mt-5">
+          <LearningStrip {...learningStripCh05} />
         </motion.div>
       )}
-      {step >= 1 && (
-        <p className="mt-3 font-mono text-[11px] text-dim">
-          Analytical evolution of the venture, not dated pivots. Concept labels only; no historical feature list is claimed.
-        </p>
-      )}
+
     </Stage>
   )
 }

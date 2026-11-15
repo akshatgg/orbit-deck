@@ -6,12 +6,12 @@ import { ease } from '../ui'
 const EVENT_PLATFORMS = ['Eventbrite', 'Luma', 'Fatsoma']
 
 /** Horizontal bars for the multiple-response discovery-channel question. */
-export function ChannelChart({ show = true }: { show?: boolean }) {
+export function ChannelChart({ show = true, compact = false }: { show?: boolean; compact?: boolean }) {
   const [sel, setSel] = useState<string | null>(null)
   const chosen = discoveryChannels.find((c) => c.label === sel)
   return (
     <div>
-      <ul className="space-y-1.5" aria-label="Discovery channels, multiple response">
+      <ul className={compact ? 'space-y-0.5' : 'space-y-1.5'} aria-label="Discovery channels, multiple response">
         {discoveryChannels.map((c, i) => {
           const platform = EVENT_PLATFORMS.includes(c.label)
           const on = sel === c.label
@@ -24,10 +24,10 @@ export function ChannelChart({ show = true }: { show?: boolean }) {
                   setSel(on ? null : c.label)
                 }}
                 aria-pressed={on}
-                className={`grid w-full grid-cols-[minmax(110px,190px)_1fr_auto] items-center gap-3 rounded-lg px-2 py-1 text-left transition-colors ${on ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'}`}
+                className={`grid w-full grid-cols-[minmax(110px,190px)_1fr_auto] items-center gap-3 rounded-lg px-2 ${compact ? 'py-1.5' : 'py-1'} text-left transition-colors ${on ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'}`}
               >
-                <span className="text-[15px] leading-tight text-snow">{c.label}</span>
-                <span className="h-4 rounded-full bg-white/[0.05]">
+                <span className={`${compact ? 'text-[17px]' : 'text-[15px]'} leading-tight text-snow`}>{c.label}</span>
+                <span className={`${compact ? 'h-5' : 'h-4'} rounded-full bg-white/[0.05]`}>
                   <motion.span
                     className="block h-full rounded-full"
                     style={{ background: platform ? '#94a3b8' : '#60a5fa', originX: 0 }}
@@ -36,12 +36,20 @@ export function ChannelChart({ show = true }: { show?: boolean }) {
                     transition={{ duration: 0.8, ease, delay: show ? 0.1 + i * 0.05 : 0 }}
                   />
                 </span>
-                <span className="num w-[72px] text-right text-sm text-snow">{c.value} of {surveyN}</span>
+                <span className={`num w-[84px] text-right ${compact ? 'text-base' : 'text-sm'} text-snow`}>{c.value} of {surveyN}</span>
               </button>
             </li>
           )
         })}
       </ul>
+      {compact ? (
+        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-silver">
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#60a5fa]" /> Informal and institutional</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#94a3b8]" /> Event platforms</span>
+          <span className="text-dim">Multiple response: bars do not sum to {surveyN}.</span>
+        </div>
+      ) : (
+        <>
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-silver">
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#60a5fa]" /> Informal, institutional and careers channels</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#94a3b8]" /> Event-listing platforms (Eventbrite, Luma, Fatsoma)</span>
@@ -56,6 +64,8 @@ export function ChannelChart({ show = true }: { show?: boolean }) {
         )}{' '}
         Multiple-response question, so bars do not sum to {surveyN} or 100%.
       </p>
+        </>
+      )}
     </div>
   )
 }

@@ -72,3 +72,13 @@ export const screeningLearning: Learning = {
   learned: 'Access and feasibility were strong; willingness to pay was weakest.',
   changed: 'Proceed to discovery, focused on whether the problem is shared and who might pay.',
 }
+
+/** Present-mode one-line rationales — the full rationale above stays in Explore. */
+export const shortRationale: Record<string, string> = {
+  founder: 'Direct student access plus venture experience.',
+  payment: 'No institutional purchasing evidence yet.',
+  market: 'Applies beyond Imperial; size still unproven.',
+  access: 'Student cohorts and university networks.',
+  tech: 'Buildable; data rights and coverage uncertain.',
+}
+export const weakShort = 'Willingness to pay is the weak link.'

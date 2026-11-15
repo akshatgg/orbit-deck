@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 import { ScreeningRadar } from '../components/ideation/ScreeningRadar'
-import { ChapterHeader, CountUp, Expandable, Kicker, LearningCard, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { Accent, ChapterHeader, CountUp, Expandable, GlowNumber, Kicker, LearningCard, SourceNote, Stage, StageLabel, TiltCard, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
-import { SCREEN_WEIGHT, closingLine, criteria, lowest, screeningLearning, screeningTotal, verdict, verdictNote, weighted } from '../data/screening'
+import { SCREEN_WEIGHT, closingLine, shortRationale, criteria, lowest, screeningLearning, screeningTotal, verdict, verdictNote, weighted } from '../data/screening'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'screening')!
@@ -151,6 +151,79 @@ function WeakLink() {
   )
 }
 
+/** Present-mode compact list: name, bars, score, and a ONE-line rationale on the active row. */
+function PresentList({ revealed, activeId, onHover, onPick, hotId }: { revealed: number; activeId: string | null; onHover: (id: string | null) => void; onPick: (id: string) => void; hotId: string | null }) {
+  return (
+    <ul className="space-y-1.5">
+      {criteria.map((c, i) => {
+        const shown = i < revealed
+        const active = activeId === c.id
+        const hot = hotId === c.id
+        const col = hot ? 'text-amber' : shown ? 'text-snow' : 'text-dim'
+        return (
+          <li key={c.id}>
+            <button
+              type="button"
+              disabled={!shown}
+              onClick={(e) => {
+                e.stopPropagation()
+                onPick(c.id)
+              }}
+              onMouseEnter={() => shown && onHover(c.id)}
+              onMouseLeave={() => onHover(null)}
+              onFocus={() => shown && onHover(c.id)}
+              onBlur={() => onHover(null)}
+              aria-label={`${c.name}${shown ? `: ${c.score} out of 5` : ''}`}
+              className={`block w-full rounded-xl border px-4 py-2 text-left transition-all duration-500 disabled:cursor-default ${
+                hot ? 'border-amber/60 bg-amber/10 shadow-[0_0_40px_-10px_var(--color-amber)]' : active ? 'border-cyan/50 bg-white/[0.06]' : 'border-line bg-navy/50'
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <span className={`flex-1 text-[19px] font-semibold leading-tight transition-colors duration-500 ${col === 'text-dim' ? 'text-silver' : col}`}>
+                  <span className="num mr-2 text-dim">{c.q}</span>
+                  {c.name}
+                </span>
+                <ScoreBar score={c.score} show={shown} hot={hot} />
+                <span className={`num w-10 text-right text-xl font-semibold ${col}`}>{shown ? `${c.score}/5` : '–'}</span>
+              </span>
+              <AnimatePresence initial={false}>
+                {active && shown && (
+                  <motion.span
+                    key="r"
+                    className="block overflow-hidden text-[15px] leading-snug text-silver"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.35, ease }}
+                  >
+                    <span className="block pt-1">{shortRationale[c.id]}</span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function PresentVerdict() {
+  return (
+    <TiltCard glow className="px-6 py-4 text-center" max={4}>
+      <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-silver">Screening outcome</div>
+      <div className="mt-2 text-[clamp(1.6rem,2.6vw,2.5rem)] font-semibold leading-none tracking-tight text-snow" style={{ textShadow: '0 0 40px rgb(56 189 248 / 0.55), 0 0 90px rgb(139 92 246 / 0.4)' }}>
+        {verdict}
+      </div>
+      <div className="mt-2 flex items-end justify-center gap-2">
+        <GlowNumber value={screeningTotal} format={(n) => n.toFixed(2)} className="text-[clamp(3rem,5vw,4.5rem)] leading-none" />
+        <span className="pb-2 text-xl text-silver">/ 5</span>
+      </div>
+      <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Screening judgement — not validated</div>
+    </TiltCard>
+  )
+}
+
 export default function Ch02Screening({ mode, step }: ChapterProps) {
   const present = mode === 'present'
   const s = present ? step : meta.steps - 1
@@ -199,6 +272,40 @@ export default function Ch02Screening({ mode, step }: ChapterProps) {
       </AnimatePresence>
     </div>
   )
+
+  if (present) {
+    return (
+      <Stage mode={mode}>
+        <ChapterHeader num={meta.num} kicker={meta.title} title="Was Orbit *worth investigating?*" />
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <StageLabel stage={meta.stage} />
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Week 2 NVC (S1) · 5 questions · 20% each</span>
+        </div>
+        <div className="mt-4 grid items-center gap-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:gap-10">
+          <div className="flex justify-center">
+            <ScreeningRadar revealed={revealed} activeId={activeId} onHover={setHover} onPick={pick} highlightId={hotId} className="max-w-[600px]" />
+          </div>
+          <div className="space-y-3">
+            <AnimatePresence>
+              {final && (
+                <motion.div key="verdict" initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }}>
+                  <PresentVerdict />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <PresentList revealed={revealed} activeId={final ? null : activeId} onHover={setHover} onPick={pick} hotId={hotId} />
+            <AnimatePresence>
+              {final && (
+                <motion.p key="close" className="pt-1 text-center text-[clamp(1.1rem,1.6vw,1.6rem)] leading-snug" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }}>
+                  <Accent>{closingLine}</Accent>
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </Stage>
+    )
+  }
 
   return (
     <Stage mode={mode}>

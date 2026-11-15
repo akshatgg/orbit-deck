@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { criteria, type Criterion } from '../../data/screening'
 import { ease } from '../ui'
 
@@ -30,13 +30,16 @@ export function ScreeningRadar({
   onHover,
   onPick,
   highlightId,
+  className = 'max-w-[520px]',
 }: {
   revealed: number
   activeId: string | null
   onHover: (id: string | null) => void
   onPick: (id: string) => void
   highlightId?: string | null
+  className?: string
 }) {
+  const reduce = useReducedMotion()
   const scores = criteria.map((c, i) => (i < revealed ? c.score : 0))
   const label = (c: Criterion, i: number) => {
     const a = ang(i)
@@ -53,7 +56,7 @@ export function ScreeningRadar({
   }
 
   return (
-    <svg viewBox="0 0 520 390" className="h-auto w-full max-w-[520px]" role="group" aria-label="Radar chart of the five screening scores, each out of 5">
+    <svg viewBox="0 0 520 390" className={`h-auto w-full ${className}`} role="group" aria-label="Radar chart of the five screening scores, each out of 5">
       {/* rings */}
       {[1, 2, 3, 4, 5].map((r) => (
         <polygon
@@ -84,6 +87,7 @@ export function ScreeningRadar({
         stroke={STAGE}
         strokeWidth={2}
         strokeLinejoin="round"
+        style={{ filter: 'drop-shadow(0 0 14px rgb(56 189 248 / 0.55))' }}
       />
 
       {/* vertices + labels */}
@@ -114,7 +118,19 @@ export function ScreeningRadar({
               if (e.key === 'Enter' && shown) onPick(c.id)
             }}
           >
-            <motion.circle initial={false} animate={{ cx: p.x, cy: p.y, opacity: shown ? 1 : 0, r: active ? 8 : 5.5 }} transition={{ duration: 0.8, ease }} fill={col} stroke="#080d1a" strokeWidth={2} />
+            {hot && shown && !reduce && (
+              <motion.circle
+                cx={p.x}
+                cy={p.y}
+                fill="none"
+                stroke={AMBER}
+                strokeWidth={2}
+                initial={{ r: 8, opacity: 0.9 }}
+                animate={{ r: [8, 26], opacity: [0.9, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+              />
+            )}
+            <motion.circle initial={false} style={{ filter: `drop-shadow(0 0 8px ${col})` }} animate={{ cx: p.x, cy: p.y, opacity: shown ? 1 : 0, r: active ? 8 : 5.5 }} transition={{ duration: 0.8, ease }} fill={col} stroke="#080d1a" strokeWidth={2} />
             <circle cx={pt(i, MAX).x} cy={pt(i, MAX).y} r={22} fill="transparent" />
             <circle cx={p.x} cy={p.y} r={16} fill="transparent" />
             <text x={l.px} y={l.y0} textAnchor={l.anchor as 'start' | 'end' | 'middle'} fontSize={16} className="select-none">

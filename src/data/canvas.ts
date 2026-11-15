@@ -170,7 +170,22 @@ export const canvasTally = (['supported', 'inconclusive', 'untested', 'contradic
   count: canvasBoxes.filter((b) => b.status === s).length,
 }))
 
+/** Present-mode phrases (3–6 words): what each box said at first, and where the evidence leaves it. */
+export const canvasShort: Record<CanvasId, { initial: string; current: string }> = {
+  problem: { initial: 'Events scattered, easy to miss', current: 'Real, in our sample only' },
+  segments: { initial: 'Students first, universities pay', current: 'Institutional demand unquantified' },
+  uvp: { initial: 'Every relevant event, early', current: 'Switching and adoption untested' },
+  solution: { initial: 'Personalised feed, links out', current: 'Prototype only, not live' },
+  channels: { initial: 'Imperial first, then wider', current: 'Institutional sales untested' },
+  revenue: { initial: 'University-funded subscription', current: 'No paid contract confirmed' },
+  cost: { initial: 'Team, hosting, scaling support', current: 'Integration cost uncertain' },
+  metrics: { initial: 'Activation, repeat use, renewal', current: 'Proposed targets, no results' },
+  advantage: { initial: 'Imperial student access', current: 'A head start, not a moat' },
+}
+
 export const riskiest = {
+  /** Present-mode hero wording (full wording in `statement`). */
+  short: 'A university will *pay and renew* for measurable results.',
   statement: 'A university will pay and renew for measurable improvements in student event discovery and participation.',
   linked: ['revenue', 'metrics'] as CanvasId[],
   principle: 'The Week 3 learning principle is not to complete the canvas once. It is to move assumptions towards evidence.',

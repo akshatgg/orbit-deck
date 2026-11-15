@@ -269,7 +269,7 @@ export function Presentation({ idx, step, go }: { idx: number; step: number; go:
 
       {/* stage — chapters swing through depth in the direction of travel */}
       <div className="absolute inset-0" style={{ perspective: 1600 }}>
-        <AnimatePresence mode="popLayout" initial={false} custom={dir.current}>
+        <AnimatePresence mode="popLayout" custom={dir.current}>
           <motion.main
             key={meta.slug}
             custom={dir.current}

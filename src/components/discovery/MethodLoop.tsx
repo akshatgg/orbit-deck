@@ -4,7 +4,7 @@ import { methodSequence } from '../../data/research'
 import { ease } from '../ui'
 
 /** Method as a visual sequence with a loop arrow back to the hypothesis. */
-export function MethodLoop({ show = true }: { show?: boolean }) {
+export function MethodLoop({ show = true, big = false }: { show?: boolean; big?: boolean }) {
   return (
     <div className="rounded-2xl border border-line bg-navy/50 p-4 sm:p-5" aria-label="Research method sequence">
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-3">
@@ -19,7 +19,7 @@ export function MethodLoop({ show = true }: { show?: boolean }) {
               className="flex items-center gap-2"
             >
               <span
-                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-[17px] ${
+                className={`flex items-center gap-2 rounded-full border ${big ? 'px-5 py-3 text-[clamp(1.05rem,1.7vw,1.45rem)]' : 'px-4 py-2 text-[17px]'} ${
                   last ? 'border-violet/60 bg-violet/15 text-snow' : 'border-ev-observed/40 bg-ev-observed/10 text-snow'
                 }`}
               >

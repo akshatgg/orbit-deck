@@ -2,8 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Target } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { CanvasDrawer, CanvasGrid, DetailFields, type CanvasView } from '../components/model/CanvasGrid'
+import { FlipCanvas, StatusNumber } from '../components/model/FlipCanvas'
 import ModelHeader from '../components/model/ModelHeader'
-import { Button, ChapterHeader, EvidenceTag, Expandable, LearningCard, SourceNote, Stage, StatusPill, ease } from '../components/ui'
+import { Button, ChapterHeader, CountUp, EvidenceTag, Expandable, LearningCard, SourceNote, SplitHeadline, Stage, StatusPill, ease } from '../components/ui'
 import { canvasBoxes, canvasLearning, canvasTally, riskiest, type CanvasId } from '../data/canvas'
 import { chapters } from '../data/chapters'
 import { statusMeta } from '../data/evidence'
@@ -73,6 +74,60 @@ function RiskCallout({ compact }: { compact: boolean }) {
   )
 }
 
+
+/** Present mode: one hero row (number / tally / statement) over the flipping canvas. */
+function PresentCanvas({ step, onOpen }: { step: number; onOpen: (id: CanvasId) => void }) {
+  return (
+    <>
+      <div className="mt-3 flex min-h-[84px] items-center" aria-live="polite">
+        <AnimatePresence mode="wait" initial={false}>
+          {step === 0 && (
+            <motion.div key="s0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }} className="flex items-baseline gap-4">
+              <span className="glow-num text-[clamp(3rem,5.2vw,4.8rem)] font-semibold leading-none text-snow">
+                <CountUp value={canvasBoxes.length} duration={0.8} />
+              </span>
+              <span className="text-[clamp(1.1rem,1.6vw,1.6rem)] text-silver">hypotheses, none tested yet</span>
+            </motion.div>
+          )}
+          {step === 1 && (
+            <motion.div key="s1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }} className="flex flex-wrap items-center gap-x-9 gap-y-2">
+              {canvasTally.map((t) => (
+                <StatusNumber key={t.status} count={t.count} status={t.status} />
+              ))}
+            </motion.div>
+          )}
+          {step >= 2 && (
+            <motion.div key="s2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.5, ease }} className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <EvidenceTag label="proposed" text="Riskiest assumption" />
+              <p className="text-[clamp(1.5rem,2.9vw,2.7rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-snow">
+                <SplitHeadline text={riskiest.short} />
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      <div className="mt-3">
+        <FlipCanvas current={step >= 1} risk={step >= 2} onOpen={onOpen} />
+      </div>
+      <div className="mt-2.5 min-h-[46px]">
+        <AnimatePresence mode="wait" initial={false}>
+          {step >= 2 ? (
+            <motion.div key="full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <Expandable title={<span className="text-[14px]">Full wording: revenue streams + key metrics</span>} className="max-w-3xl">
+                {riskiest.statement}
+              </Expandable>
+            </motion.div>
+          ) : (
+            <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="font-mono text-[11px] text-dim">
+              S2 · click a card for detail
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  )
+}
+
 export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
   const present = mode === 'present'
   const [exploreView, setExploreView] = useState<CanvasView>('current')
@@ -88,7 +143,7 @@ export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
   return (
     <Stage mode={mode} className={present ? 'py-[58px]! sm:py-[60px]!' : ''}>
       {present ? (
-        <ModelHeader num={meta.num} kicker={meta.title} title={meta.headline} stage={meta.stage} compact />
+        <ModelHeader num={meta.num} kicker={meta.title} title={meta.headline.replace('not a finished blueprint.', '*not a finished blueprint.*')} stage={meta.stage} compact />
       ) : (
         <>
           <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} lead="Week 3 taught us that the canvas is not a form to complete once. Each box below is a working hypothesis with an honest evidence status." />
@@ -98,39 +153,24 @@ export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
         </>
       )}
 
-      <div className={`flex flex-wrap items-center justify-between gap-x-6 gap-y-3 ${present ? 'mt-3' : 'mt-8'}`}>
-        <div className="flex flex-wrap items-center gap-4">
-          <ViewToggle view={view} onChange={setView} />
-          <Tally current={view === 'current'} />
-        </div>
-        {view === 'current' && (
-          <Button variant={risk ? 'primary' : 'outline'} size="sm" onClick={toggleRisk} aria-pressed={risk}>
-            <Target size={14} /> {risk ? 'Show all nine boxes' : 'Show our riskiest assumption'}
-          </Button>
-        )}
-      </div>
-
-      <div className={present ? 'mt-3' : 'mt-4'}>
-        <CanvasGrid view={view} risk={risk} ringRisk={!present && view === 'current'} onOpen={setOpen} compact={present} />
-      </div>
-
       {present ? (
-        <div className="mt-3 min-h-0">
-          <AnimatePresence mode="wait" initial={false}>
-            {step >= 2 ? (
-              <motion.div key="risk" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="space-y-2">
-                <RiskCallout compact />
-              </motion.div>
-            ) : (
-              <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="font-mono text-[11px] text-dim">
-                {step === 0 ? 'Click any box for its hypothesis, evidence, next experiment and what would change our mind. ' : 'Click any box for details. '}
-                <span className="text-dim">Source: S2.</span>
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
+        <PresentCanvas step={step} onOpen={setOpen} />
       ) : (
         <>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+            <div className="flex flex-wrap items-center gap-4">
+              <ViewToggle view={view} onChange={setView} />
+              <Tally current={view === 'current'} />
+            </div>
+            {view === 'current' && (
+              <Button variant={risk ? 'primary' : 'outline'} size="sm" onClick={toggleRisk} aria-pressed={risk}>
+                <Target size={14} /> {risk ? 'Show all nine boxes' : 'Show our riskiest assumption'}
+              </Button>
+            )}
+          </div>
+          <div className="mt-4">
+            <CanvasGrid view={view} risk={risk} ringRisk={view === 'current'} onOpen={setOpen} compact={false} />
+          </div>
           <div className="mt-6">
             <RiskCallout compact={false} />
           </div>

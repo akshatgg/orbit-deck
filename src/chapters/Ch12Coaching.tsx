@@ -1,9 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import ChallengeDetail from '../components/validation/ChallengeDetail'
-import { Badge, Card, ChapterHeader, LearningCard, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
+import { Hero, PresentHeader } from '../components/validation/PitchKit'
+import { PropositionMorph, QuestionOrbs, QuestionRoom } from '../components/validation/PitchCoaching'
+import { Accent, Card, ChapterHeader, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { coachingChallenges, coachingLearning, versionComparison } from '../data/coaching'
+import { coachingPresent, coachingStrip } from '../data/validationPresent'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'coaching')!
@@ -32,9 +35,8 @@ function EndLine({ className = '' }: { className?: string }) {
 }
 
 export default function Ch12Coaching({ mode, step, setStep }: ChapterProps) {
-  const sourceNote = <SourceNote>Source: S6 coaching session feedback. Critique and refinement, not market validation.</SourceNote>
-
   if (mode === 'explore') {
+    const sourceNote = <SourceNote>Source: S6 coaching session feedback. Critique and refinement, not market validation.</SourceNote>
     return (
       <Stage mode="explore">
         <StageLabel stage={meta.stage} className="mb-3" />
@@ -65,71 +67,42 @@ export default function Ch12Coaching({ mode, step, setStep }: ChapterProps) {
   }
 
   const active = step >= 1 && step <= 5 ? step - 1 : -1
-  const title = <SplitHeadline text={meta.headline} className="t-h2 block" />
 
   return (
     <Stage mode="present">
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={title} />
-      <div className="mt-6">
+      <PresentHeader stage={meta.stage} num={meta.num} kicker={meta.title} title="The strongest challenge to our idea was not *whether people liked it.*" />
+      <div className="mt-6 min-h-[28rem]">
         <AnimatePresence mode="wait" initial={false}>
-          {step <= 5 ? (
-            <motion.div key="room" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease }} className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
-              <div role="list" aria-label="Coaching questions" className="grid gap-2.5">
-                {coachingChallenges.map((c, i) => {
-                  const on = i === active
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      role="listitem"
-                      aria-pressed={on}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setStep(i + 1)
-                      }}
-                      className={`flex items-start gap-4 rounded-2xl border px-5 py-3.5 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet ${
-                        on ? 'border-snow/70 bg-white/[0.07] shadow-[0_0_40px_-18px_rgba(196,181,253,0.8)]' : active === -1 ? 'border-line bg-navy/70 hover:border-silver/50' : 'border-line bg-navy/40 opacity-60 hover:opacity-100'
-                      }`}
-                      style={{ transform: on ? 'translateX(6px)' : undefined }}
-                    >
-                      <span className={`num mt-0.5 text-2xl ${on ? 'text-snow' : 'text-dim'}`}>{i + 1}</span>
-                      <span className="font-serif text-[clamp(1.1rem,1.55vw,1.6rem)] italic leading-snug text-snow">“{c.question}”</span>
-                    </button>
-                  )
-                })}
-              </div>
-              <div className="min-h-[18rem]">
-                <AnimatePresence mode="wait" initial={false}>
-                  {active >= 0 ? (
-                    <motion.div key={active} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.45, ease }}>
-                      <ChallengeDetail c={coachingChallenges[active]} />
-                    </motion.div>
-                  ) : (
-                    <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex h-full flex-col justify-center rounded-2xl border border-dashed border-line p-6">
-                      <Badge tone="silver">Source S6 · coaching session</Badge>
-                      <p className="t-lead mt-4 text-snow">Five questions. Each one is a challenge, an implication and a revised decision.</p>
-                      <p className="mt-3 text-[15px] text-dim">Select a question, or press → to bring them forward in order.</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+          {step === 0 && (
+            <motion.div key="intro" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.5, ease }} className="space-y-10 pt-4">
+              <Hero size="lg">
+                Five questions. <Accent>Each one changed a decision.</Accent>
+              </Hero>
+              <QuestionOrbs active={-1} onPick={setStep} large />
             </motion.div>
-          ) : (
+          )}
+          {step >= 1 && step <= 5 && (
+            <motion.div key={`q${active}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35, ease }} className="space-y-6">
+              <QuestionRoom index={active} />
+              <QuestionOrbs active={active} onPick={setStep} />
+            </motion.div>
+          )}
+          {step >= 6 && (
             <motion.div key="versions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }}>
-              <Versions />
-              <Reveal delay={0.3}>
-                <p className="mt-4 text-[16px] text-silver">{versionComparison.note}</p>
+              <PropositionMorph />
+              <Reveal delay={1.1} className="mt-8">
+                <Hero size="lg" className="font-normal">
+                  {coachingPresent.endLead} <Accent>{coachingPresent.endAccent}</Accent>
+                </Hero>
               </Reveal>
-              <Reveal delay={0.5}>
-                <EndLine className="mt-5 max-w-5xl" />
-              </Reveal>
-              <LearningCard className="mt-6" compact learning={coachingLearning} />
+              <LearningStrip className="mt-6" {...coachingStrip} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-      <div className="mt-3">{sourceNote}</div>
+      <div className="mt-3">
+        <SourceNote>{coachingPresent.source}</SourceNote>
+      </div>
     </Stage>
   )
 }

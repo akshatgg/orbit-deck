@@ -61,11 +61,11 @@ function target(i: number, view: DotView, lit: { missed: number; toomany: number
 }
 
 /** 42 respondent dots (SVG). Dots slide between layouts; positions show counts, not respondent overlap. */
-export function DotField({ view, missed = 35, toomany = 31 }: { view: DotView; missed?: number; toomany?: number }) {
+export function DotField({ view, missed = 35, toomany = 31, tall = false }: { view: DotView; missed?: number; toomany?: number; tall?: boolean }) {
   const lit = { missed, toomany }
   const causes = view === 'causes'
   return (
-    <svg viewBox={`-8 0 ${W + 8} ${H}`} className="h-auto max-h-[46vh] w-full" role="img" aria-label={`${surveyN} survey respondent dots, view: ${view}`}>
+    <svg viewBox={`-8 0 ${W + 8} ${H}`} className={`h-auto w-full ${tall ? 'max-h-[54vh]' : 'max-h-[46vh]'}`} role="img" aria-label={`${surveyN} survey respondent dots, view: ${view}`}>
       {/* highlight: combined discovery-related misses */}
       <motion.rect
         x={-6}
@@ -102,19 +102,6 @@ export function DotField({ view, missed = 35, toomany = 31 }: { view: DotView; m
           </text>
         </motion.g>
       ))}
-      <motion.text
-        x={W - 8}
-        y={126}
-        textAnchor="end"
-        fontSize={52}
-        fontFamily="JetBrains Mono, monospace"
-        fill="#60a5fa"
-        initial={false}
-        animate={{ opacity: causes ? 1 : 0 }}
-        transition={{ duration: 0.5, delay: causes ? 0.7 : 0 }}
-      >
-        23
-      </motion.text>
     </svg>
   )
 }

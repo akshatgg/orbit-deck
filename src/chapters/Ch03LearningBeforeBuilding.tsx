@@ -1,5 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChapterHeader, Expandable, LearningCard, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { useState } from 'react'
+import { ChapterHeader, Expandable, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { PresentHeader } from '../components/discovery/pitch'
+import { QuestionDeck } from '../components/discovery/QuestionDeck'
+import { ResearchOrbit, WallStrip } from '../components/discovery/ResearchOrbit'
+import { learningStripCh03 } from '../data/discoveryShort'
 import { MethodLoop } from '../components/discovery/MethodLoop'
 import { QuestionExplorer } from '../components/discovery/QuestionExplorer'
 import { ResearchWall } from '../components/discovery/ResearchWall'
@@ -31,6 +36,7 @@ const Limitations = ({ mode }: { mode: ChapterProps['mode'] }) => (
 )
 
 export default function Ch03LearningBeforeBuilding({ mode, step }: ChapterProps) {
+  const [sel, setSel] = useState(0)
   const explore = mode === 'explore'
   const s = explore ? meta.steps - 1 : step
 
@@ -63,42 +69,33 @@ export default function Ch03LearningBeforeBuilding({ mode, step }: ChapterProps)
   }
 
   return (
-    <Stage mode={mode}>
-      <StageLabel stage={meta.stage} className="mb-3" />
-      <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
-      <Reveal show className="mt-1">
-        <p className="mt-3 max-w-4xl text-base text-silver sm:text-lg">
-          Week 3 customer-discovery principles (S2): organise the investigation around past behaviour, not around whether people like Orbit.
-        </p>
-      </Reveal>
+    <Stage mode={mode} className="!justify-start !pb-8 !pt-20">
+      <PresentHeader meta={meta} title="We needed to understand behaviour, *not collect compliments.*" />
 
-      <div className="mt-5">
+      <div className="mt-4">
         <AnimatePresence mode="wait" initial={false}>
           {s === 0 ? (
-            <motion.div key="wall" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }}>
-              <ResearchWall />
+            <motion.div key="wall" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.4, ease }}>
+              <ResearchOrbit />
+              <SourceNote className="mt-3 justify-center">S2 · Week 3 principle: ask about past behaviour, not opinions.</SourceNote>
             </motion.div>
           ) : (
-            <motion.div key="strip" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease }}>
-              <ResearchWall compact />
+            <motion.div key="rest" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }} className="space-y-4">
+              <WallStrip />
+              {(s === 1 || s === 2) && <QuestionDeck sel={sel} onSel={setSel} showWhy={s === 2} />}
+              {s === 3 && (
+                <div className="space-y-4">
+                  <MethodLoop big />
+                  <Reveal show delay={0.3}>
+                    <LearningStrip {...learningStripCh03} />
+                  </Reveal>
+                  <Limitations mode={mode} />
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {(s === 1 || s === 2) && (
-        <motion.div key="q" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mt-4">
-          <QuestionExplorer showWhy={s === 2} />
-        </motion.div>
-      )}
-
-      {s === 3 && (
-        <motion.div key="m" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mt-4 space-y-3">
-          <MethodLoop />
-          <Limitations mode={mode} />
-          <LearningCard learning={learning} compact />
-        </motion.div>
-      )}
     </Stage>
   )
 }

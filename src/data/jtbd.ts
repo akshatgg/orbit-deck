@@ -8,6 +8,8 @@ export interface Stakeholder {
   short: string
   role: RoleKind
   job: string
+  /** Present-mode one-liner (≤ 14 words) — a job statement, not a testimonial */
+  pitch: string
   /** label for the second block */
   detailLabel: string
   detail: string
@@ -24,6 +26,7 @@ export const stakeholders: Stakeholder[] = [
     role: 'user',
     job: 'When I have limited time and many event sources, help me discover relevant opportunities early enough to decide whether to attend.',
     alternatives: 'Emails, group chats, calendars, university platforms and external discovery apps.',
+    pitch: 'Help me find relevant events early enough to decide whether to go.',
     detailLabel: 'Desired outcome',
     detail: 'Less search effort, more timely awareness and better event relevance.',
     pos: { x: 50, y: 11 },
@@ -34,6 +37,7 @@ export const stakeholders: Stakeholder[] = [
     short: 'University',
     role: 'payer',
     job: 'Help our students discover and participate in the opportunities we already provide, without creating significant additional administration.',
+    pitch: 'Help students use what we already offer, without extra admin for us.',
     detailLabel: 'Potential value',
     detail: 'Better visibility of existing programmes and potentially greater participation.',
     pos: { x: 88, y: 50 },
@@ -44,6 +48,7 @@ export const stakeholders: Stakeholder[] = [
     short: 'Organiser',
     role: 'supplier',
     job: 'Help relevant students discover my events and reach the original registration page.',
+    pitch: 'Help the right students find my events and reach my registration page.',
     detailLabel: 'Potential value',
     detail: 'Additional attributable discovery and referral traffic.',
     pos: { x: 50, y: 89 },
@@ -54,6 +59,7 @@ export const stakeholders: Stakeholder[] = [
     short: 'IT / data owner',
     role: 'gatekeeper',
     job: 'Enable any integration to operate within our technical, security, data-protection and procurement requirements.',
+    pitch: 'Let any integration meet our security, data and procurement rules.',
     detailLabel: 'Potential value',
     detail: 'A controlled complementary discovery layer rather than replacement of existing systems.',
     pos: { x: 12, y: 50 },
