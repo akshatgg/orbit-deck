@@ -1,37 +1,37 @@
 import type { ComponentType } from 'react'
 import type { ChapterProps } from '../shell/types'
-import Ch00Opening from './Ch00Opening'
-import Ch01Student from './Ch01Student'
-import Ch02Reframe from './Ch02Reframe'
-import Ch03Research from './Ch03Research'
-import Ch04Reveal from './Ch04Reveal'
-import Ch05Product from './Ch05Product'
-import Ch06ValueProp from './Ch06ValueProp'
-import Ch07BusinessModel from './Ch07BusinessModel'
-import Ch08Market from './Ch08Market'
-import Ch09GTM from './Ch09GTM'
-import Ch10Financials from './Ch10Financials'
-import Ch11Risks from './Ch11Risks'
-import Ch12Pilot from './Ch12Pilot'
-import Ch13Vision from './Ch13Vision'
-import Ch14Team from './Ch14Team'
-import Ch15Closing from './Ch15Closing'
+import Ch00Question from './Ch00Question'
+import Ch01Origin from './Ch01Origin'
+import Ch02Screening from './Ch02Screening'
+import Ch03LearningBeforeBuilding from './Ch03LearningBeforeBuilding'
+import Ch04WhatStudentsToldUs from './Ch04WhatStudentsToldUs'
+import Ch05AssumptionsChanged from './Ch05AssumptionsChanged'
+import Ch06Jtbd from './Ch06Jtbd'
+import Ch07Product from './Ch07Product'
+import Ch08WhoPays from './Ch08WhoPays'
+import Ch09LeanCanvas from './Ch09LeanCanvas'
+import Ch10Viability from './Ch10Viability'
+import Ch11MarketEngagement from './Ch11MarketEngagement'
+import Ch12Coaching from './Ch12Coaching'
+import Ch13Experiment from './Ch13Experiment'
+import Ch14Scale from './Ch14Scale'
+import Ch15Verdict from './Ch15Verdict'
 
 export const chapterComponents: Record<string, ComponentType<ChapterProps>> = {
-  'opening': Ch00Opening,
-  'student': Ch01Student,
-  'reframe': Ch02Reframe,
-  'research': Ch03Research,
-  'reveal': Ch04Reveal,
-  'product': Ch05Product,
-  'value-prop': Ch06ValueProp,
-  'business-model': Ch07BusinessModel,
-  'market': Ch08Market,
-  'gtm': Ch09GTM,
-  'financials': Ch10Financials,
-  'risks': Ch11Risks,
-  'pilot': Ch12Pilot,
-  'vision': Ch13Vision,
-  'team': Ch14Team,
-  'closing': Ch15Closing,
+  'question': Ch00Question,
+  'origin': Ch01Origin,
+  'screening': Ch02Screening,
+  'learning-before-building': Ch03LearningBeforeBuilding,
+  'what-students-told-us': Ch04WhatStudentsToldUs,
+  'assumptions-changed': Ch05AssumptionsChanged,
+  'jtbd': Ch06Jtbd,
+  'product': Ch07Product,
+  'who-pays': Ch08WhoPays,
+  'lean-canvas': Ch09LeanCanvas,
+  'viability': Ch10Viability,
+  'market-engagement': Ch11MarketEngagement,
+  'coaching': Ch12Coaching,
+  'experiment': Ch13Experiment,
+  'scale': Ch14Scale,
+  'verdict': Ch15Verdict,
 }

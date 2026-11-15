@@ -1,75 +1,89 @@
 /**
- * Primary research — figures exactly as stated in the team report.
- * Always render with their denominators.
+ * Primary research (master prompt §10–11). OBSERVED evidence.
+ * Denominator is 42 analysed survey responses throughout. Some source screenshots show 44;
+ * that reconciliation is acknowledged in limitations — never substitute 44-response figures.
  */
-export const survey = {
-  n: 42,
-  label: 'Student survey',
-  findings: [
-    { id: 'missed', value: 35, of: 42, text: 'reported missing an event in the previous four weeks', tone: 'amber' },
-    { id: 'too-many', value: 31, of: 42, text: 'agreed there are too many places to check', tone: 'violet' },
-    { id: 'too-late', value: 23, of: 42, text: 'attributed their latest missed event to discovering it too late, missing a deadline or the event being full', tone: 'blue' },
-    { id: 'clash', value: 10, of: 42, text: 'cited timetable clashes — a cause discovery alone cannot solve', tone: 'silver' },
-    { id: 'imperial', value: 27, of: 42, text: 'respondents were Imperial MSc students', tone: 'silver' },
-  ],
-} as const
+export const surveyN = 42
+export const interviewN = 13
 
-export const interviews = {
-  n: 13,
-  label: 'Qualitative interviews',
-  findings: [
-    { id: 'late', value: 12, of: 13, text: 'described a missed or late-discovered event' },
-    { id: 'friends', value: 12, of: 13, text: 'said friends influenced how they discover events' },
-    { id: 'another-app', value: 4, of: 13, text: 'expressed concerns about using another app' },
-  ],
-} as const
+export const researchMeta = {
+  interviews: 13,
+  surveyResponses: 42,
+  interviewDates: '26–29 October 2026',
+  recruitment: 'Participants recruited through team networks.',
+  imperialMsc: 27, // of 42 survey respondents were Imperial Business School MSc students
+}
+
+export const headlineFindings = [
+  { id: 'missed', value: 35, of: 42, text: 'reported missing at least one event in the previous four weeks', source: 'survey' },
+  { id: 'too-many', value: 31, of: 42, text: 'agreed that there were too many places to check', source: 'survey' },
+  { id: 'interview-missed', value: 12, of: 13, text: 'interviewees described missing an event or finding out about it too late', source: 'interviews' },
+] as const
 
 /**
- * Discovery-channel themes. The report does not supply per-channel counts,
- * so this is shown as a qualitative theme list, not a ranked chart.
+ * Cause of the MOST RECENT missed event. These listed categories account for 38 of 42
+ * responses — do not invent categories for the remaining 4.
  */
-export const interviewThemes = [
-  {
-    title: 'Late discovery is common',
-    detail: '12 of 13 interviewees described a missed or late-discovered event.',
-  },
-  {
-    title: 'Friends are a discovery channel',
-    detail: 'Friends influenced event discovery in 12 of 13 interviews — a social layer matters.',
-  },
-  {
-    title: 'Fragmentation',
-    detail: '31 of 42 survey respondents agreed there are too many places to check.',
-  },
-  {
-    title: 'App fatigue is real',
-    detail: 'Four interviewees were concerned about adopting yet another app — Orbit must earn its place.',
-  },
+export const missCauses = [
+  { id: 'late', label: 'Heard too late', value: 13, discovery: true },
+  { id: 'clash', label: 'Timetable clash', value: 10, discovery: false },
+  { id: 'deadline', label: 'Missed registration deadline', value: 5, discovery: true },
+  { id: 'full', label: 'Event full', value: 5, discovery: true },
+  { id: 'forgot', label: 'Forgot', value: 5, discovery: false },
+] as const
+export const missCausesListedTotal = 38
+export const discoveryRelatedMisses = 23 // late + deadline + full
+
+/** Multiple-response question — counts do NOT sum to 42 or 100%. */
+export const discoveryChannels = [
+  { label: 'Friends or course-mates', value: 26 },
+  { label: 'University emails', value: 24 },
+  { label: 'WhatsApp or social media', value: 23 },
+  { label: 'Careers platforms', value: 17 },
+  { label: 'Students’ Union or societies', value: 16 },
+  { label: 'Eventbrite', value: 7 },
+  { label: 'Luma', value: 6 },
+  { label: 'Fatsoma', value: 2 },
+  { label: 'Handshake', value: 2 },
+] as const
+
+/** Genuine anonymised interview quotes from the report. Do not add others unless supplied. */
+export const quotes = [
+  { text: 'WhatsApp is handy, but the chat is chaos half the time.', who: 'Interviewee (anonymised)' },
+  { text: 'It would need to be quicker than what I do now, otherwise there’s not much point.', who: 'Interviewee (anonymised)' },
+] as const
+
+export const otherInterviewSignals = [
+  { value: 4, of: 13, text: 'interviewees were wary of adopting another system' },
+] as const
+
+export const researchQuestions = [
+  'Tell us about the last event you wanted to attend but missed.',
+  'How did you first hear about it?',
+  'What platforms did you use?',
+  'Was registration still open?',
+  'What prevented you from attending?',
+  'How do you currently keep track of events?',
 ]
 
-export const methodologyLabel = 'Exploratory convenience sample; not representative of all UK students.'
+export const whyTheseQuestions = [
+  'Recent behaviour is stronger evidence than hypothetical enthusiasm.',
+  'Missed events help identify the actual problem.',
+  'Existing workarounds reveal competitors for student attention.',
+  'Negative responses reveal where the opportunity may be weaker.',
+]
+
+export const methodSequence = ['Hypothesis', 'Interviews', 'Survey', 'Compare findings', 'Revise assumptions']
 
 export const limitations = [
-  { title: 'Small sample size', detail: '42 survey responses and 13 interviews support exploration, not statistical generalisation.' },
-  { title: 'Imperial-heavy recruitment', detail: '27 of 42 respondents were Imperial MSc students; results may not transfer to other institutions.' },
-  { title: 'Potential survey-introduction bias', detail: 'Introducing the survey around event discovery may have primed respondents to recall missed events.' },
-  { title: 'Problem ≠ willingness to pay', detail: 'Problem frequency among students says nothing about whether universities will pay to solve it.' },
-  { title: 'Not everything is a discovery problem', detail: 'Timetable clashes (10 of 42) cannot be solved by better discovery alone.' },
+  'Small convenience sample.',
+  'Imperial-heavy sample (27 of 42 respondents were Imperial Business School MSc students).',
+  'Self-reported behaviour.',
+  'No representative population estimate.',
+  'The survey introduction named Orbit.',
+  'One interview involved leading prompts.',
+  'Some source screenshots display 44 responses, while the analysed dataset reports 42; reconciliation remains required. 42 is used as the denominator throughout.',
 ]
 
-export const discoverySources = [
-  'University emails',
-  'Careers portals',
-  'Student societies',
-  'Event platforms',
-  'Group chats',
-  'Organiser websites',
-]
-
-export const discoveryPains = [
-  'Missed deadlines',
-  'Repeated searching',
-  'Information overload',
-  'Irrelevant events',
-  'Uncertain coverage',
-]
+export const keyInsight =
+  'Students are not simply searching for more events. They need relevant opportunities to reach them in time, with less effort than their current habits.'

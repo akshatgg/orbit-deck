@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, ExternalLink, LayoutGrid, Maximize, Minimize
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { chapterComponents } from '../chapters'
 import { Logo, ease } from '../components/ui'
-import { chapters } from '../data/chapters'
+import { chapters, stages } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import { ModeToggle } from './ModeToggle'
 import { ChapterGrid, PresenterPanel, fmtTime } from './PresenterPanel'
@@ -182,7 +182,7 @@ export function Presentation({ idx, step, go }: { idx: number; step: number; go:
         <div className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-dim md:flex">
           <span className="text-silver">{meta.num}</span>
           <span>·</span>
-          <span>{meta.act === 'Prologue' ? 'Prologue' : `Act ${meta.act}`}</span>
+          <span>{stages[meta.stage].label}</span>
           <span>·</span>
           <span className="text-silver">{meta.navLabel}</span>
         </div>

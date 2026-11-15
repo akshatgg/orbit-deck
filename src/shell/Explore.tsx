@@ -5,10 +5,6 @@ import { chapterComponents } from '../chapters'
 import { Kicker, Logo, OrbitFieldLazy, ease } from './exploreParts'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
-import AssumptionLab from '../explore/AssumptionLab'
-import ChaosSimulator from '../explore/ChaosSimulator'
-import EvidenceRoom from '../explore/EvidenceRoom'
-import ScenarioExplorer from '../explore/ScenarioExplorer'
 import { ModeToggle } from './ModeToggle'
 import { presentHash } from './route'
 
@@ -23,17 +19,11 @@ interface Section {
 /** Explore-mode information architecture. Chapters are reused (no duplicated content). */
 export const sections: Section[] = [
   { id: 'overview', label: 'Overview', blocks: [] },
-  { id: 'problem', label: 'Problem', blocks: [{ chapter: 'student' }, { chapter: 'reframe' }, { extra: ChaosSimulator, title: 'Opportunity Chaos Simulator' }] },
-  { id: 'product', label: 'Product', blocks: [{ chapter: 'reveal' }, { chapter: 'product' }] },
-  { id: 'research', label: 'Research & Evidence', blocks: [{ chapter: 'research' }] },
-  { id: 'business-model', label: 'Business Model', blocks: [{ chapter: 'value-prop' }, { chapter: 'business-model' }] },
-  { id: 'market', label: 'Market', blocks: [{ chapter: 'market' }, { chapter: 'gtm' }] },
-  { id: 'financials', label: 'Financials', blocks: [{ chapter: 'financials' }, { extra: ScenarioExplorer, title: 'Financial Scenario Explorer' }] },
-  { id: 'assumptions', label: 'Assumption Lab', blocks: [{ chapter: 'risks' }, { extra: AssumptionLab, title: 'The Assumption Lab' }] },
-  { id: 'pilot', label: 'Pilot Roadmap', blocks: [{ chapter: 'pilot' }] },
-  { id: 'expansion', label: 'Expansion', blocks: [{ chapter: 'vision' }] },
-  { id: 'team', label: 'Team', blocks: [{ chapter: 'team' }] },
-  { id: 'references', label: 'Evidence Room', blocks: [{ extra: EvidenceRoom, title: 'The Evidence Room' }] },
+  { id: 'ideation', label: '1 · Ideation & Screening', blocks: [{ chapter: 'question' }, { chapter: 'origin' }, { chapter: 'screening' }] },
+  { id: 'discovery', label: '2 · Discovery', blocks: [{ chapter: 'learning-before-building' }, { chapter: 'what-students-told-us' }, { chapter: 'assumptions-changed' }] },
+  { id: 'bmd', label: '3 · Business Model', blocks: [{ chapter: 'jtbd' }, { chapter: 'product' }, { chapter: 'who-pays' }, { chapter: 'lean-canvas' }, { chapter: 'viability' }] },
+  { id: 'validation', label: '4 · Validation', blocks: [{ chapter: 'market-engagement' }, { chapter: 'coaching' }, { chapter: 'experiment' }, { chapter: 'scale' }] },
+  { id: 'verdict', label: 'Verdict', blocks: [{ chapter: 'verdict' }] },
 ]
 
 const noop = () => {}

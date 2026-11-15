@@ -2,9 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink, RotateCcw, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ease } from '../components/ui'
-import { acts, chapters, type Act } from '../data/chapters'
+import { chapters, stages, type StageId } from '../data/chapters'
 import { pitchConfig } from '../data/config'
-import { speakerAssignments, team } from '../data/presenters'
+import { defaultSpeakers as speakerAssignments, team } from '../data/team'
 import { channel, type SyncMsg } from './route'
 
 export const fmtTime = (ms: number) => {
@@ -35,7 +35,7 @@ function PanelBody({ idx, step, elapsed, onReset, onGoto }: { idx: number; step:
         </div>
       </div>
       <ul className="space-y-2 rounded-xl border border-line bg-ink/50 p-4 text-[15px] leading-relaxed text-snow">
-        {cur.notes.map((n, i) => (
+        {cur.cues.map((n, i) => (
           <li key={i} className="flex gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet" />
             {n}
@@ -86,7 +86,7 @@ function PanelBody({ idx, step, elapsed, onReset, onGoto }: { idx: number; step:
             </li>
           ))}
         </ol>
-        <p className="mt-2 text-[11px] text-dim">Allocation is provisional — edit src/data/presenters.ts.</p>
+        <p className="mt-2 text-[11px] text-dim">Allocation is editable in the Rehearsal view.</p>
       </div>
       <div className="text-[11px] leading-relaxed text-dim">
         Keys: → / Space next · ← back · G chapters · P panel · F fullscreen · I immersive · T timer · Esc close
@@ -185,7 +185,7 @@ export function PresenterWindow() {
 }
 
 export function ChapterGrid({ open, current, onClose, onPick }: { open: boolean; current: number; onClose: () => void; onPick: (i: number) => void }) {
-  const byAct = (Object.keys(acts) as Act[]).map((a) => ({ act: a, items: chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.act === a) }))
+  const byAct = (Object.keys(stages) as StageId[]).map((a) => ({ act: a, items: chapters.map((c, i) => ({ c, i })).filter(({ c }) => c.stage === a) }))
   return (
     <AnimatePresence>
       {open && (
@@ -208,7 +208,7 @@ export function ChapterGrid({ open, current, onClose, onPick }: { open: boolean;
             <div className="grid gap-8 md:grid-cols-3">
               {byAct.map(({ act, items }) => (
                 <div key={act}>
-                  <div className="t-kicker mb-3">{act === 'Prologue' ? 'Prologue' : `Act ${act}`} · {acts[act]}</div>
+                  <div className="t-kicker mb-3">{stages[act].label}</div>
                   <div className="space-y-2">
                     {items.map(({ c, i }) => (
                       <button
@@ -218,7 +218,7 @@ export function ChapterGrid({ open, current, onClose, onPick }: { open: boolean;
                       >
                         <div className="num text-xs text-dim">{c.num}</div>
                         <div className="font-medium">{c.title}</div>
-                        <div className="text-xs text-silver">{c.question}</div>
+                        <div className="text-xs text-silver">{c.headline}</div>
                       </button>
                     ))}
                   </div>

@@ -1,26 +1,37 @@
 /**
- * Global pitch configuration. Edit freely — nothing else needs to change.
+ * Global configuration — edit freely; nothing else needs to change.
  */
 export const pitchConfig = {
   startup: 'Orbit',
   tagline: 'Discover your next opportunity.',
-  valueProposition: 'Every opportunity that matters, in one place — personalised to you.',
+  subtitle: 'A New Venture Creation journey from observation to evidence.',
+  valueProposition: 'Every relevant opportunity, in one place, early enough to act.',
   course: 'New Venture Creation · MSc Innovation, Entrepreneurship & Management',
-  school: 'Imperial College Business School, London',
+  school: 'Imperial College Business School',
+  teamName: 'Team 2S',
 
-  /** Target pitch length in minutes (used by presenter timing). */
-  targetDurationMin: 11,
+  /** Default presentation length in minutes (editable live in the Rehearsal view). */
+  targetDurationMin: 10,
 
-  /** Live working prototype. Set to null to hide the "Launch real prototype" button. */
+  /** Existing real prototype. null hides every link to it. */
   prototypeUrl: 'https://orbit.akshatgg.in/' as string | null,
 
   /**
-   * Optional 30-second product video (mp4/webm URL or a file placed in /public).
-   * Leave null to show the interactive demonstration instead. Never point this
-   * at a mock-up passed off as a real recording.
+   * The team's 30-second Orbit video (mp4/webm URL, YouTube/Vimeo embed URL, or a file in /public).
+   * null shows a placeholder and falls back to the interactive walkthrough.
    */
   productVideoUrl: null as string | null,
 
-  /** Optional ambient sound — muted by default; set a file in /public to enable the toggle. */
-  ambientAudioUrl: null as string | null,
+  /**
+   * VERIFIED prototype walkthrough results (A5). Leave null until the team supplies real counts.
+   * Never invent X/N outcomes.
+   */
+  verifiedPrototypeResults: null as null | {
+    participants: number
+    unaidedCompletion: number
+    relevantEventFound: number
+    availabilityMatch: number
+    redirectReached: number
+    notes?: string
+  },
 } as const

@@ -1,7 +1,8 @@
 import { AnimatePresence, animate, motion, useInView, useReducedMotion } from 'framer-motion'
 import { ChevronDown, Info } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { statusMeta, type Status } from '../data/strategy'
+import { labelMeta, statusMeta, type EvidenceLabel, type Learning, type Status } from '../data/evidence'
+import { stages, type StageId } from '../data/chapters'
 
 export const ease = [0.22, 1, 0.36, 1] as const
 
@@ -100,11 +101,61 @@ export const IllustrativeBadge = ({ label = 'Illustrative', className = '' }: { 
   </Badge>
 )
 
-export const ProjectionBadge = ({ className = '' }: { className?: string }) => (
-  <Badge tone="cyan" className={className}>
-    Workbook projection
-  </Badge>
-)
+/** Evidence-convention tag: OBSERVED · REPORTED · MODELLED · PROPOSED · UNRESOLVED (§27). */
+export function EvidenceTag({ label, className = '', text }: { label: EvidenceLabel; className?: string; text?: string }) {
+  const m = labelMeta[label]
+  return (
+    <span
+      title={m.meaning}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] ${className}`}
+      style={{ borderColor: `color-mix(in srgb, ${m.color} 45%, transparent)`, color: m.color, background: `color-mix(in srgb, ${m.color} 9%, transparent)` }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: m.color }} />
+      {text ?? m.label}
+    </span>
+  )
+}
+
+/** @deprecated use <EvidenceTag label="modelled" /> */
+export const ProjectionBadge = ({ className = '' }: { className?: string }) => <EvidenceTag label="modelled" className={className} />
+
+/** Framework stage label, e.g. "Stage 2 · Discovery". */
+export function StageLabel({ stage, className = '' }: { stage: StageId; className?: string }) {
+  const s = stages[stage]
+  return (
+    <span className={`inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] ${className}`} style={{ color: s.color }}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.color }} />
+      {stage === 'verdict' ? s.label : `Stage ${s.n} · ${s.label}`}
+    </span>
+  )
+}
+
+/**
+ * The recurring storytelling device (§2) that closes every major chapter:
+ * What we believed → What we investigated → What we learned → What changed.
+ * `compact` renders one row for present mode.
+ */
+export function LearningCard({ learning, show = true, compact = false, className = '' }: { learning: Learning; show?: boolean; compact?: boolean; className?: string }) {
+  const cols: { k: keyof Learning; t: string; c: string }[] = [
+    { k: 'believed', t: 'What we believed', c: 'var(--color-silver)' },
+    { k: 'investigated', t: 'What we investigated', c: 'var(--color-ev-observed)' },
+    { k: 'learned', t: 'What we learned', c: 'var(--color-st-supported)' },
+    { k: 'changed', t: 'What changed', c: 'var(--color-ev-proposed)' },
+  ]
+  return (
+    <div className={`grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4 ${className}`} aria-label="Learning card">
+      {cols.map((col, i) => (
+        <Reveal key={col.k} show={show} delay={i * 0.12} className={`bg-navy/95 ${compact ? 'p-4' : 'p-5'}`}>
+          <div className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.14em]" style={{ color: col.c }}>
+            <span className="num text-dim">{i + 1}</span> {col.t}
+            {i < 3 && <span className="ml-auto hidden text-dim lg:inline">→</span>}
+          </div>
+          <p className={`mt-2 leading-snug text-snow ${compact ? 'text-[15px]' : 'text-base'}`}>{learning[col.k]}</p>
+        </Reveal>
+      ))}
+    </div>
+  )
+}
 
 export function SourceNote({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (

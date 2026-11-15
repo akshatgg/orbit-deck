@@ -5,26 +5,36 @@
  * (violet → orbit blue → lavender → warm peach on near-black).
  */
 @theme {
-  --color-ink: #070a12;
-  --color-navy: #10172a;
-  --color-navy-2: #172038;
-  --color-violet: #8066ff;
-  --color-violet-soft: #b7a8ff;
-  --color-blue: #3b82f6;
-  --color-cyan: #3de0ea;
-  --color-peach: #ffa36b;
-  --color-amber: #ffb547;
-  --color-lavender: #d6c8ff;
-  --color-snow: #f7f9fc;
-  --color-silver: #9ca9bc;
-  --color-dim: #5d6a80;
-  --color-line: rgb(156 169 188 / 0.14);
+  /* Base palette (master prompt §4) */
+  --color-ink: #080d1a; /* deep midnight navy */
+  --color-navy: #111827; /* graphite */
+  --color-navy-2: #1a2234;
+  --color-violet: #8b5cf6; /* electric violet */
+  --color-violet-soft: #c4b5fd;
+  --color-blue: #38bdf8; /* ice blue */
+  --color-cyan: #38bdf8;
+  --color-peach: #fdba74;
+  --color-lavender: #ddd6fe;
+  --color-snow: #f8fafc; /* off-white */
+  --color-silver: #94a3b8; /* muted slate */
+  --color-dim: #64748b;
+  --color-line: rgb(148 163 184 / 0.16);
 
-  /* evidence status colours (neutral, not traffic-light hype) */
-  --color-st-supported: #4fd1a5;
-  --color-st-partial: #7cb4ff;
-  --color-st-untested: #9ca9bc;
-  --color-st-contradicted: #ff7a7a;
+  /* Semantic evidence colours — use ONLY with their meaning
+     observed = blue · unresolved = amber · supported = green
+     contradicted / risk = red · proposed / future = violet */
+  --color-ev-observed: #60a5fa;
+  --color-ev-reported: #7dd3fc;
+  --color-ev-modelled: #a5b4fc;
+  --color-ev-proposed: #a78bfa;
+  --color-ev-unresolved: #fbbf24;
+  --color-st-supported: #34d399;
+  --color-st-inconclusive: #fbbf24;
+  --color-st-untested: #94a3b8;
+  --color-st-contradicted: #f87171;
+  --color-amber: #fbbf24;
+  --color-green: #34d399;
+  --color-red: #f87171;
 
   --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
@@ -33,8 +43,8 @@
 
 :root {
   color-scheme: dark;
-  --grad-orbit: linear-gradient(120deg, #8066ff 0%, #3b82f6 45%, #3de0ea 100%);
-  --grad-warm: linear-gradient(120deg, #b7a8ff 0%, #ffa36b 100%);
+  --grad-orbit: linear-gradient(120deg, #8b5cf6 0%, #6d8bfa 50%, #38bdf8 100%);
+  --grad-warm: linear-gradient(120deg, #c4b5fd 0%, #fdba74 100%);
 }
 
 html,
@@ -52,7 +62,7 @@ body {
 }
 
 ::selection {
-  background: rgb(128 102 255 / 0.45);
+  background: rgb(139 92 246 / 0.45);
 }
 
 /* Typography helpers */
@@ -108,13 +118,13 @@ body {
 
 /* Restrained glass */
 .glass {
-  background: linear-gradient(180deg, rgb(23 32 56 / 0.72), rgb(16 23 42 / 0.6));
+  background: linear-gradient(180deg, rgb(26 34 52 / 0.7), rgb(17 24 39 / 0.62));
   border: 1px solid var(--color-line);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 .glass-strong {
-  background: rgb(16 23 42 / 0.92);
+  background: rgb(17 24 39 / 0.94);
   border: 1px solid rgb(156 169 188 / 0.2);
   backdrop-filter: blur(20px);
 }
@@ -122,9 +132,8 @@ body {
 /* Atmospheric background */
 .atmosphere {
   background:
-    radial-gradient(60% 50% at 15% 10%, rgb(128 102 255 / 0.16), transparent 60%),
-    radial-gradient(50% 45% at 90% 85%, rgb(59 130 246 / 0.14), transparent 60%),
-    radial-gradient(40% 35% at 85% 10%, rgb(255 163 107 / 0.06), transparent 60%),
+    radial-gradient(60% 50% at 15% 10%, rgb(139 92 246 / 0.10), transparent 60%),
+    radial-gradient(50% 45% at 90% 85%, rgb(56 189 248 / 0.07), transparent 60%),
     var(--color-ink);
 }
 
@@ -158,4 +167,9 @@ button {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Static fallback when motion is reduced: stop decorative canvas loops */
+.paused-motion * {
+  animation-play-state: paused !important;
 }
