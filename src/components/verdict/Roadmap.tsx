@@ -6,7 +6,7 @@ import { externalBranch, type Phase } from '../../data/roadmap'
 export function PhaseCard({ phase, show, compact }: { phase: Phase; show: boolean; compact: boolean }) {
   return (
     <Reveal show={show} className="flex h-full flex-col">
-      <div className="glass flex h-full flex-col rounded-2xl p-5">
+      <div className={`glass flex h-full flex-col rounded-2xl ${compact ? 'p-4' : 'p-5'}`}>
         <div className="flex items-center justify-between gap-2">
           <span className="t-kicker">{phase.years}</span>
           <EvidenceTag label="modelled" />
@@ -16,7 +16,7 @@ export function PhaseCard({ phase, show, compact }: { phase: Phase; show: boolea
         <div className="mt-3 flex flex-wrap items-end gap-x-5 gap-y-1">
           {phase.target.map((t) => (
             <div key={t.label}>
-              <span className="num text-4xl font-semibold text-snow">{t.value}</span>
+              <span className={`num font-semibold text-snow ${compact ? 'text-3xl' : 'text-4xl'}`}>{t.value}</span>
               <span className="ml-2 text-sm text-silver">{t.label}</span>
             </div>
           ))}

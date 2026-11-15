@@ -120,7 +120,6 @@ export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
             {step >= 2 ? (
               <motion.div key="risk" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="space-y-2">
                 <RiskCallout compact />
-                <LearningCard learning={canvasLearning} compact className="[&>div]:!p-3 [&_p]:!text-[14px]" />
               </motion.div>
             ) : (
               <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="font-mono text-[11px] text-dim">

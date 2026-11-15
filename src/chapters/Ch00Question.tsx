@@ -65,7 +65,7 @@ function Scene({ children }: { children: ReactNode }) {
 }
 
 const ScenarioBar = () => (
-  <div className="absolute inset-x-0 top-6 z-10 flex flex-wrap items-center justify-center gap-3 px-6 sm:top-8">
+  <div className="absolute inset-x-0 top-[68px] z-10 flex flex-wrap items-center justify-center gap-3 px-6">
     <StageLabel stage={meta.stage} />
     <IllustrativeBadge label={scenarioLabel} className="!text-[11px] !normal-case !tracking-normal" />
   </div>

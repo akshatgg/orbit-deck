@@ -15,7 +15,7 @@ export default function Ch14Scale({ mode, step }: ChapterProps) {
   const compact = present && s >= 4
 
   return (
-    <Stage mode={mode}>
+    <Stage mode={mode} className={present ? 'sm:py-[68px]!' : ''}>
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <StageLabel stage={meta.stage} />
       </div>
@@ -27,9 +27,11 @@ export default function Ch14Scale({ mode, step }: ChapterProps) {
         ))}
       </div>
 
-      <div className={compact ? 'mt-5' : 'mt-6'}>
-        <ExternalBranch show={s >= 4} compact={compact} />
-      </div>
+      {(!present || s >= 4) && (
+        <div className={compact ? 'mt-4' : 'mt-6'}>
+          <ExternalBranch show={s >= 4} compact={compact} />
+        </div>
+      )}
 
       <div className="mt-4">
         <SourceNote>
@@ -74,7 +76,7 @@ export default function Ch14Scale({ mode, step }: ChapterProps) {
         </div>
       )}
 
-      {(!present || s >= 4) && (
+      {!present && (
         <Reveal show={s >= 4} className="mt-6">
           <LearningCard
             compact
