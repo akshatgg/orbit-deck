@@ -31,6 +31,7 @@ export function ScreeningRadar({
   onPick,
   highlightId,
   className = 'max-w-[520px]',
+  interactive = true,
 }: {
   revealed: number
   activeId: string | null
@@ -38,6 +39,8 @@ export function ScreeningRadar({
   onPick: (id: string) => void
   highlightId?: string | null
   className?: string
+  /** false in present mode: no hover / click / focus, purely a visual. */
+  interactive?: boolean
 }) {
   const reduce = useReducedMotion()
   const scores = criteria.map((c, i) => (i < revealed ? c.score : 0))
@@ -101,11 +104,11 @@ export function ScreeningRadar({
         return (
           <g
             key={c.id}
-            role={shown ? 'button' : undefined}
-            tabIndex={shown ? 0 : -1}
+            role={shown && interactive ? 'button' : undefined}
+            tabIndex={shown && interactive ? 0 : -1}
             aria-label={shown ? `${c.name}: ${c.score} out of 5` : undefined}
             aria-hidden={!shown}
-            style={{ cursor: shown ? 'pointer' : 'default', outline: 'none' }}
+            style={{ cursor: shown && interactive ? 'pointer' : 'default', outline: 'none', pointerEvents: interactive ? undefined : 'none' }}
             onMouseEnter={() => shown && onHover(c.id)}
             onMouseLeave={() => onHover(null)}
             onFocus={() => shown && onHover(c.id)}

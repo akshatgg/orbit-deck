@@ -41,6 +41,9 @@ function artStyle(hue: number): CSSProperties {
   }
 }
 
+/** One accent per source type, shared with the chapter's source chips. */
+export const sourceColors = { careers: '#38bdf8', calendar: '#a78bfa', society: '#f472b6', public: '#fbbf24' } as const
+
 const hideScroll: CSSProperties = { scrollbarWidth: 'none', msOverflowStyle: 'none' }
 
 /* ---------- Frame ---------- */
@@ -176,12 +179,20 @@ function EventCard({ e, score, reasons, d, from }: { e: SampleEvent; score?: num
           <div className="text-[14.5px] font-semibold leading-tight" style={{ color: P.text }}>
             {e.title}
           </div>
-          <div className="mt-1 text-[11.5px] leading-snug" style={{ color: P.sub }}>
-            {sourceLabels[e.source]}
-          </div>
+          {d.spotlight === 'source' ? (
+            <div className="mt-1.5">
+              <span className="inline-block rounded-full px-2.5 py-1 text-[12.5px] font-semibold leading-none" style={{ background: `${sourceColors[e.source]}2e`, color: sourceColors[e.source], border: `1px solid ${sourceColors[e.source]}66` }}>
+                {sourceLabels[e.source].replace(' (sample)', '')}
+              </span>
+            </div>
+          ) : (
+            <div className="mt-1 text-[11.5px] leading-snug" style={{ color: P.sub }}>
+              {sourceLabels[e.source]}
+            </div>
+          )}
           {band && (
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px]">
-              <span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: 'rgba(123,147,255,0.16)', color: '#a9b8ff' }}>
+              <span className={`rounded-full px-2 py-0.5 font-semibold ${d.spotlight === 'match' ? 'text-[12.5px]' : ''}`} style={d.spotlight === 'match' ? { background: 'rgba(139,92,246,0.3)', color: '#e2d9ff', border: '1px solid rgba(167,139,250,0.6)' } : { background: 'rgba(123,147,255,0.16)', color: '#a9b8ff' }}>
                 {band}
               </span>
               {reasons?.[0] && <span style={{ color: P.sub }}>{reasons[0]}</span>}
@@ -335,7 +346,8 @@ function Onboarding({ d }: { d: OrbitDemo }) {
 }
 
 function Feed({ d }: { d: OrbitDemo }) {
-  const [open, setOpen] = useState(false)
+  const open = d.filtersOpen
+  const setOpen = (f: (o: boolean) => boolean) => d.setFiltersOpen(f(open))
   const uniLabel = d.university.short
   return (
     <div className="absolute inset-0 overflow-y-auto px-4 pb-[88px] pt-3" style={hideScroll}>
@@ -393,6 +405,8 @@ function Feed({ d }: { d: OrbitDemo }) {
               <Chip key={n} small label={`${n} ${dayDates[i]}`} on={d.day === i} onClick={() => d.setDay(d.day === i ? null : i)} />
             ))}
           </div>
+          {!d.dateOnlyFilters && (
+            <>
           <div className="mt-3 text-[11.5px] font-medium uppercase tracking-[0.12em]" style={{ color: P.sub }}>
             Category
           </div>
@@ -410,6 +424,8 @@ function Feed({ d }: { d: OrbitDemo }) {
             <Chip small label="Sort: relevance" on={d.sort === 'relevance'} onClick={() => d.setSort('relevance')} />
             <Chip small label="Sort: soonest" on={d.sort === 'soonest'} onClick={() => d.setSort('soonest')} />
           </div>
+            </>
+          )}
         </div>
       )}
 
@@ -424,7 +440,7 @@ function Feed({ d }: { d: OrbitDemo }) {
           </button>
         )}
       </div>
-      {!d.hasPrefs && (
+      {!d.hasPrefs && d.showHint && (
         <button type="button" onClick={d.restartOnboarding} className="mb-2 w-full rounded-xl px-3 py-2 text-left text-[12.5px]" style={{ background: P.surface2, color: P.sub }}>
           No interests set yet, so nothing is ranked. Tap to set them up.
         </button>

@@ -1,5 +1,6 @@
 import type { Status } from './evidence'
 import type { StageId } from './chapters'
+import { walkthroughTask } from './walkthroughs'
 
 /**
  * Venture Journey Map (master prompt §6). 14 nodes across the four stages.
@@ -43,7 +44,7 @@ export const journeyNodes: JourneyNode[] = [
     decision: 'GO — investigate further (not “build the company”).',
   },
   {
-    id: 4, label: 'Customer discovery', stage: 'discovery', chapter: 'learning-before-building', kind: 'completed', status: 'supported',
+    id: 4, label: 'Customer discovery', stage: 'discovery', chapter: 'what-students-told-us', kind: 'completed', status: 'supported',
     question: 'How do students actually discover — and miss — events?',
     activity: '13 semi-structured interviews (26–29 Oct 2026) and 42 analysed survey responses.',
     learned: 'Past-behaviour questions surface real misses and existing workarounds.',
@@ -68,7 +69,7 @@ export const journeyNodes: JourneyNode[] = [
     question: 'Which parts of the business model are evidence and which are assumptions?',
     activity: 'Nine-box Lean Canvas with an evidence status per box.',
     learned: 'Only the problem box is supported; revenue has no confirmed paid contract.',
-    decision: 'Riskiest assumption: a university will pay and renew.',
+    decision: 'Riskiest untested guess: a university will pay and renew.',
   },
   {
     id: 8, label: 'Product prototype', stage: 'bmd', chapter: 'product', kind: 'completed', status: 'inconclusive',
@@ -81,7 +82,7 @@ export const journeyNodes: JourneyNode[] = [
     id: 9, label: 'Business model choice', stage: 'bmd', chapter: 'who-pays', kind: 'completed', status: 'untested',
     question: 'Who pays, and why?',
     activity: 'Compared university SaaS, organiser referrals and student subscription.',
-    learned: 'No path has purchasing evidence yet.',
+    learned: 'University subscription remains an untested guess; no payment has been tested.',
     decision: 'University-funded SaaS as the working hypothesis; organiser model a separate future test.',
   },
   {
@@ -99,11 +100,11 @@ export const journeyNodes: JourneyNode[] = [
     decision: 'Revise business-model assumptions around budget ownership and data access.',
   },
   {
-    id: 12, label: 'Coaching feedback', stage: 'validation', chapter: 'coaching', kind: 'completed', status: 'supported',
-    question: 'Where is our reasoning weakest?',
-    activity: 'NVC coaching session — five challenge questions.',
-    learned: 'University and organiser products are different businesses; success and stop criteria were missing.',
-    decision: 'Separate the two business models; define GO / ITERATE / STOP gates.',
+    id: 12, label: 'Product walkthroughs', stage: 'validation', chapter: 'walkthroughs', kind: 'completed', status: 'inconclusive',
+    question: 'Do students find value in Orbit when they use the prototype?',
+    activity: `Prototype walkthroughs with a neutral task: “${walkthroughTask}”`,
+    learned: 'Partial evidence (A5): first-use value is not repeat use. Retention and attendance need the pilot (A6, A7).',
+    decision: 'Refine the product from what the walkthroughs show; test repeat use and attendance in the pilot.',
   },
   {
     id: 13, label: 'Proposed pilot', stage: 'validation', chapter: 'experiment', kind: 'proposed', status: 'untested',
@@ -125,6 +126,6 @@ export const journeyNodes: JourneyNode[] = [
 export const journeyLoops: { from: number; to: number; label: string }[] = [
   { from: 5, to: 8, label: 'Discovery → revised product priorities' },
   { from: 11, to: 9, label: 'Institutional engagement → revised business-model assumptions' },
-  { from: 12, to: 9, label: 'Coaching → separate university and organiser models' },
+  { from: 12, to: 8, label: 'Walkthroughs → product refinement' },
   { from: 10, to: 13, label: 'Financial model → required purchasing & renewal evidence' },
 ]

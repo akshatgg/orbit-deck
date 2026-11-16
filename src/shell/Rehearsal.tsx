@@ -7,15 +7,16 @@ import { presenterIds, team, type PresenterId } from '../data/team'
 import { presentHash } from './route'
 import { WORDS_PER_MIN, useRehearsal, useSpeakers, wordCount } from './useRehearsal'
 
-/** Suggested split of a 10-minute slot (chapter index ranges are inclusive). */
+/** Suggested split of the 13-minute slot (12 min 15 s speaking): six ≈ 2-minute blocks, one per presenter. Chapter index ranges are inclusive. */
 const GROUPS: { key: string; label: string; stage: StageId; from: number; to: number; suggestedMin: number }[] = [
-  { key: 'ideation', label: 'Ideation & screening', stage: 'ideation', from: 0, to: 2, suggestedMin: 1.5 },
-  { key: 'discovery', label: 'Discovery', stage: 'discovery', from: 3, to: 5, suggestedMin: 2.5 },
-  { key: 'bmd', label: 'Business model & product', stage: 'bmd', from: 6, to: 9, suggestedMin: 2.5 },
-  { key: 'market', label: 'Market & financial', stage: 'bmd', from: 10, to: 10, suggestedMin: 1 },
-  { key: 'validation', label: 'Validation, pilot & verdict', stage: 'validation', from: 11, to: 15, suggestedMin: 2.5 },
+  { key: 'ideation', label: 'Opening, ideation & screening', stage: 'ideation', from: 0, to: 2, suggestedMin: 2 },
+  { key: 'discovery', label: 'Discovery → product decisions', stage: 'discovery', from: 3, to: 4, suggestedMin: 125 / 60 },
+  { key: 'bmd', label: 'Jobs, product & who pays', stage: 'bmd', from: 5, to: 7, suggestedMin: 2 },
+  { key: 'market', label: 'Lean Canvas & financials', stage: 'bmd', from: 8, to: 9, suggestedMin: 2 },
+  { key: 'validation', label: 'Engagement, walkthroughs & pilot', stage: 'validation', from: 10, to: 12, suggestedMin: 125 / 60 },
+  { key: 'verdict', label: 'Gates, scale & verdict', stage: 'validation', from: 13, to: 15, suggestedMin: 125 / 60 },
 ]
-const SUGGESTED_BASE_MIN = 10
+const SUGGESTED_BASE_MIN = 12.25
 
 const mmss = (sec: number) => {
   const s = Math.max(0, Math.round(sec))
@@ -109,7 +110,7 @@ export function Rehearsal({ go }: { go: (hash: string, replace?: boolean) => voi
             <div className="mt-2">
               <NumField value={r.targetMin} onCommit={r.setTargetMin} min={1} max={120} step={0.5} label="Total presentation time in minutes" suffix="minutes" />
             </div>
-            <span className="mt-1 block text-[11px] text-dim">Default {pitchConfig.targetDurationMin} min. Chapters without an override scale to fit.</span>
+            <span className="mt-1 block text-[11px] text-dim">Default {pitchConfig.targetDurationMin} min speaking (12:15) inside a 13-minute slot. Chapters without an override scale to fit.</span>
           </label>
           <div className="grid grid-cols-3 gap-2 text-center">
             <Stat label="Target" value={mmss(r.targetSec)} />

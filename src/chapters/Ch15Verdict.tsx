@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { Button, ChapterHeader, Expandable, LearningCard, Logo, Reveal, SourceNote, Stage, StageLabel, StatusPill, ease } from '../components/ui'
-import { AssumptionChips, Finale, FinaleCinematic, TeamRolesCompact, ThreeColumns, ThreeColumnsPunchy, TrackerSummary, VerdictHero, VerdictStamp, WhoPursues } from '../components/verdict/VerdictParts'
+import { Button, ChapterHeader, Expandable, LearningCard, Logo, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, StatusPill, ease } from '../components/ui'
+import { AssumptionsSlide, Finale, FinaleStatic, OwnersCompact, ThreeColumns, TrackerSummary, VerdictHero, VerdictStamp, WhoPursues } from '../components/verdict/VerdictParts'
 import { assumptions } from '../data/assumptions'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
@@ -28,39 +28,37 @@ function CallToAction() {
   )
 }
 
-const swap = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10 }, transition: { duration: 0.5, ease } }
+const swap = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10 }, transition: { duration: 0.4, ease } }
 
 export default function Ch15Verdict({ mode, step }: ChapterProps) {
   if (mode === 'explore') return <Explore mode={mode} />
 
-  // Present: later steps replace earlier content so every step fits one screen.
-  const view = step <= 3 ? 'columns' : step === 4 ? 'verdict' : 'finale'
+  // Present: three steps — the final assumptions slide, CONDITIONAL GO, the return to the opening question.
   return (
-    <Stage mode={mode} center={view !== 'columns'}>
+    <Stage mode={mode} center={step !== 0}>
       <AnimatePresence mode="wait" initial={false}>
-        {view === 'columns' && (
-          <motion.div key="columns" {...swap} className="w-full">
-            <div className="mb-3">
+        {step === 0 && (
+          <motion.div key="assumptions" {...swap} className="w-full">
+            <div className="mb-2">
               <StageLabel stage={meta.stage} />
             </div>
-            <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
-            <div className="mt-6">
-              <ThreeColumnsPunchy s1={step >= 1} s2={step >= 2} s3={step >= 3} />
+            <ChapterHeader num={meta.num} kicker={meta.title} title={<SplitHeadline className="text-[clamp(1.8rem,3.5vw,3.5rem)]" text="Orbit’s business model has *8 key assumptions*" delay={0.08} />} />
+            <div className="mt-5">
+              <AssumptionsSlide animate />
             </div>
           </motion.div>
         )}
-        {view === 'verdict' && (
+        {step === 1 && (
           <motion.div key="verdict" {...swap} className="w-full">
             <VerdictHero />
-            <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              <TeamRolesCompact />
-              <AssumptionChips />
+            <div className="mt-8">
+              <OwnersCompact />
             </div>
           </motion.div>
         )}
-        {view === 'finale' && (
+        {step >= 2 && (
           <motion.div key="finale" {...swap} className="w-full">
-            <FinaleCinematic openingQuestion={openingQuestion} onEvidence={goEvidence} tagline={pitchConfig.tagline} />
+            <FinaleStatic openingQuestion={openingQuestion} onEvidence={goEvidence} tagline={pitchConfig.tagline} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -76,6 +74,12 @@ function Explore({ mode }: { mode: 'explore' }) {
       </div>
       <ChapterHeader num={meta.num} kicker={meta.title} title={meta.headline} />
       <div className="mt-10">
+        <h3 className="t-h2 mb-4">Orbit’s business model has 8 key assumptions</h3>
+        <AssumptionsSlide />
+      </div>
+
+      <div className="mt-16">
+        <h3 className="t-h2 mb-4">What we know, what we do not know, what we should do</h3>
         <ThreeColumns s1 s2 s3 />
       </div>
 
@@ -92,7 +96,8 @@ function Explore({ mode }: { mode: 'explore' }) {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="num font-semibold text-snow">{a.id}</span>
                   <StatusPill status={a.status} />
-                  <span className="text-snow">{a.claim}</span>
+                  <span className="text-snow">{a.title}</span>
+                  <span className="text-sm text-silver">{a.statusText}</span>
                 </div>
                 <p className="mt-1.5">{a.evidence}</p>
                 <p className="mt-1 text-dim">
@@ -103,7 +108,7 @@ function Explore({ mode }: { mode: 'explore' }) {
           </ul>
         </Expandable>
         <div className="mt-3">
-          <SourceNote>Assumption statuses are the team’s own assessment (S3, S4). A5 will only report verified walkthrough results when they exist.</SourceNote>
+          <SourceNote>Assumption statuses are the team’s own assessment (S3, S4). A5 reports walkthrough results only as far as they are verified.</SourceNote>
         </div>
       </div>
 

@@ -1,13 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ExternalLink } from 'lucide-react'
+import { ArrowRight, Briefcase, CalendarDays, ExternalLink, Globe, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ArchitectureDiagram, FlowPipeline, MvpBoundary, MvpChips, mvpEndLine } from '../components/bmd/ProductDiagrams'
-import { DemoSideControls, OrbitDemoPhone, PhoneShell } from '../components/bmd/OrbitDemoPhone'
+import { DemoSideControls, OrbitDemoPhone, PhoneShell, sourceColors } from '../components/bmd/OrbitDemoPhone'
 import { PhoneHero } from '../components/bmd/PhoneHero'
-import { useOrbitDemo } from '../components/bmd/useOrbitDemo'
+import { presetPrefs, useOrbitDemo, type OrbitDemo } from '../components/bmd/useOrbitDemo'
 import { VideoPanel } from '../components/bmd/VideoPanel'
-import { Button, ChapterHeader, EvidenceTag, Expandable, IllustrativeBadge, LearningCard, LearningStrip, Reveal, SourceNote, SplitHeadline, Stage, StageLabel } from '../components/ui'
-import { topics } from '../data/demoEvents'
+import { Button, ChapterHeader, EvidenceTag, Expandable, IllustrativeBadge, LearningCard, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
+import { availabilities, sourceLabels, topics, type SourceKey } from '../data/demoEvents'
+import { valueProps } from '../data/productDecisions'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import type { Learning } from '../data/evidence'
@@ -68,13 +69,36 @@ export default function Ch07Product({ mode, step }: ChapterProps) {
   const [view, setView] = useState<View>('walk')
   const present = mode === 'present'
 
-  // Presenter steps drive the phone: step 0 = onboarding, step 1 = feed.
+  const d2 = useOrbitDemo()
+
+  // Presenter steps put the phone in the state that shows each benefit. The phone stays tappable.
   useEffect(() => {
     if (!present) return
-    if (step === 0) d.restartOnboarding()
-    else if (step === 1 && d.screen === 'onboard') {
-      if (!d.hasPrefs) d.applyPreset()
-      d.setScreen('feed')
+    d.setScreen('feed')
+    d.setScope('london')
+    d.setQuery('')
+    d.setFmt(null)
+    d.setMatchesOnly(false)
+    d.setShowHint(false)
+    if (step === 0) {
+      d.setPrefs({ topics: [], formats: [], availability: [] })
+      d.setSort('soonest')
+      d.setDay(null)
+      d.setFiltersOpen(false)
+      d.setDateOnlyFilters(false)
+      d.setSpotlight('source')
+    } else {
+      d.setPrefs(presetPrefs)
+      d.setSort('relevance')
+      d.setSpotlight('match')
+      d.setDay(step === 2 ? 2 : null)
+      d.setFiltersOpen(step === 2)
+      d.setDateOnlyFilters(step === 2)
+    }
+    if (step === 2) {
+      d2.setPrefs(presetPrefs)
+      d2.openEvent('s6', 'feed')
+      d2.setScreen('redirect')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, present])
@@ -92,7 +116,7 @@ export default function Ch07Product({ mode, step }: ChapterProps) {
     <>
       <StageLabel stage={meta.stage} />
       <div className="mt-2">
-        <ChapterHeader num={meta.num} kicker={meta.title} title={<span className="t-h2 block">{meta.headline}</span>} />
+        <ChapterHeader num={meta.num} kicker={meta.title} title={<span className={present ? 'block text-[clamp(1.3rem,1.7vw,2.1rem)] font-semibold leading-tight tracking-[-0.02em]' : 't-h2 block'}>{meta.headline}</span>} />
       </div>
     </>
   )
@@ -164,72 +188,170 @@ export default function Ch07Product({ mode, step }: ChapterProps) {
   }
 
   /* ---------------- Present ---------------- */
-  const showPhone = step <= 1
-  const heroPhone = (
-    <PhoneHero caption={<IllustrativeBadge label="Sample data" />}>
-      <PhoneShell style={{ width: 'min(calc((100vh - 200px) / 2.05), 400px)' }}>
-        <OrbitDemoPhone d={d} />
-      </PhoneShell>
-    </PhoneHero>
-  )
+  const vp = valueProps[Math.min(step, valueProps.length - 1)]
+  const phoneW = step === 2 ? 'min(calc((100vh - 200px) / 2.05), 330px)' : 'min(calc((100vh - 200px) / 2.05), 400px)'
   return (
-    <Stage mode={mode} className={`sm:!pb-[56px] ${showPhone ? 'sm:!pt-[64px]' : 'sm:!justify-start sm:!pt-[92px]'}`}>
-      {showPhone ? (
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
-          <div className="flex flex-col gap-6">
-            {header}
-            <Reveal show className="max-w-xl">
-              <p className="t-lead !text-[1.2rem]">{step === 0 ? 'Set it up like a student would.' : 'Tap an interest. The feed re-ranks.'}</p>
-            </Reveal>
-            <div className="flex max-w-2xl flex-wrap gap-2.5" role="group" aria-label="Interests">
-              {topics.map((t) => {
-                const on = d.prefs.topics.includes(t)
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      d.toggleTopic(t)
-                    }}
-                    className={`rounded-full border px-4 py-2 text-base font-medium transition-all ${on ? 'border-violet bg-violet/25 text-snow shadow-[0_0_24px_-4px_rgba(139,92,246,0.8)]' : 'border-line text-silver hover:border-violet/50 hover:text-snow'}`}
-                  >
-                    {t}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-          <div className="mx-auto px-6">{heroPhone}</div>
-        </div>
-      ) : (
-        <div className="flex min-h-0 flex-1 flex-col gap-6">
-          <div>{header}</div>
-          <div className="flex flex-1 flex-col justify-center gap-9 pb-8">
-            {step === 2 && (
-              <>
-                <p className="text-[clamp(1.6rem,3vw,2.6rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
-                  <SplitHeadline text="Orbit is a *discovery layer.* Not a replacement." />
-                </p>
-                <FlowPipeline />
-                <div className="flex flex-wrap items-center gap-3">
-                  <EvidenceTag label="proposed" text="Design, no live integrations" />
+    <Stage mode={mode} className="sm:!py-[64px]">
+      <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-10">
+        <div className="flex min-w-0 flex-col gap-5">
+          {header}
+          <ValueRail step={step} />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }} className="flex flex-col gap-4">
+              <div className="flex items-start gap-4">
+                <span className="glow-num num text-[clamp(3.4rem,6vw,5.6rem)] font-semibold leading-[0.9] text-violet-soft">{vp.n}</span>
+                <div className="min-w-0">
+                  <p className="text-[clamp(2rem,3.6vw,3.4rem)] font-semibold leading-[1.02] tracking-[-0.025em] text-snow">
+                    <SplitHeadline text={vp.title} />
+                  </p>
+                  <p className="mt-2 max-w-xl text-[clamp(1rem,1.3vw,1.2rem)] leading-snug text-silver">{vp.line}</p>
                 </div>
-              </>
-            )}
-            {step === 3 && (
-              <>
-                <p className="text-[clamp(1.6rem,3vw,2.6rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
-                  <SplitHeadline text="Test discovery. *Not feature count.*" />
-                </p>
-                <MvpChips />
-                <LearningStrip believed="More features, more useful." learned="Coverage, relevance, source trust matter most." changed="Narrow MVP; social features parked." />
-              </>
+              </div>
+              {step === 0 && <SourceFlow />}
+              {step === 1 && <InterestChips d={d} />}
+              {step === 2 && <ScheduleChips d={d} />}
+            </motion.div>
+          </AnimatePresence>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <IllustrativeBadge label="Sample data, in-page demo" />
+            {pitchConfig.prototypeUrl && (
+              <a
+                href={pitchConfig.prototypeUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 text-[13px] text-silver underline-offset-4 hover:text-snow hover:underline"
+              >
+                Open the real prototype <ExternalLink size={12} />
+              </a>
             )}
           </div>
         </div>
-      )}
+        <div className="flex items-center justify-center gap-5 px-4">
+          <PhoneHero>
+            <PhoneShell style={{ width: phoneW }}>
+              <OrbitDemoPhone d={d} />
+            </PhoneShell>
+          </PhoneHero>
+          <AnimatePresence>
+            {step === 2 && (
+              <motion.div key="redir" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.6, ease, delay: 0.25 }} className="flex items-center gap-4">
+                <ArrowRight className="shrink-0 text-violet-soft" size={30} aria-hidden />
+                <PhoneHero>
+                  <PhoneShell style={{ width: phoneW }}>
+                    <OrbitDemoPhone d={d2} />
+                  </PhoneShell>
+                </PhoneHero>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </Stage>
+  )
+}
+
+/* ---------- Present-mode helpers ---------- */
+
+function ValueRail({ step }: { step: number }) {
+  return (
+    <ol className="flex flex-wrap gap-2" aria-label="The three value propositions">
+      {valueProps.map((v) => {
+        const on = v.n - 1 === step
+        return (
+          <li
+            key={v.id}
+            className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[14px] font-medium transition-colors ${on ? 'border-violet bg-violet/25 text-snow' : v.n - 1 < step ? 'border-violet/40 text-silver' : 'border-line text-dim'}`}
+          >
+            <span className="num grid h-5 w-5 place-items-center rounded-full bg-white/10 text-[12px]">{v.n}</span>
+            {v.title}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+const sourceIcons: Record<SourceKey, typeof Globe> = { careers: Briefcase, calendar: CalendarDays, society: Users, public: Globe }
+
+function SourceFlow() {
+  return (
+    <div className="flex flex-wrap items-center gap-2.5" aria-label="Sources feeding one feed">
+      {(Object.keys(sourceLabels) as SourceKey[]).map((k, i) => {
+        const Icon = sourceIcons[k]
+        return (
+          <motion.span
+            key={k}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease, delay: 0.15 + i * 0.12 }}
+            className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[15px] font-medium"
+            style={{ borderColor: `${sourceColors[k]}66`, background: `${sourceColors[k]}1f`, color: sourceColors[k] }}
+          >
+            <Icon size={15} /> {sourceLabels[k].replace(' (sample)', '')}
+          </motion.span>
+        )
+      })}
+      <span className="inline-flex items-center gap-2.5 whitespace-nowrap">
+        <ArrowRight className="text-violet-soft" size={20} aria-hidden />
+        <span className="rounded-full border border-violet bg-violet/25 px-4 py-2 text-[15px] font-semibold text-snow">One feed</span>
+      </span>
+    </div>
+  )
+}
+
+function InterestChips({ d }: { d: OrbitDemo }) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="flex max-w-2xl flex-wrap gap-2.5" role="group" aria-label="Interests">
+        {topics.map((t) => {
+          const on = d.prefs.topics.includes(t)
+          return (
+            <button
+              key={t}
+              type="button"
+              aria-pressed={on}
+              onClick={(e) => {
+                e.stopPropagation()
+                d.toggleTopic(t)
+              }}
+              className={`rounded-full border px-4 py-2 text-[15px] font-medium transition-all ${on ? 'border-violet bg-violet/25 text-snow shadow-[0_0_24px_-4px_rgba(139,92,246,0.8)]' : 'border-line text-silver hover:border-violet/50 hover:text-snow'}`}
+            >
+              {t}
+            </button>
+          )
+        })}
+      </div>
+      <p className="font-mono text-[11px] text-dim">Tap an interest: the feed re-ranks</p>
+    </div>
+  )
+}
+
+function ScheduleChips({ d }: { d: OrbitDemo }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2.5" role="group" aria-label="When you are free">
+        {availabilities.map((a) => {
+          const on = d.prefs.availability.includes(a)
+          return (
+            <button
+              key={a}
+              type="button"
+              aria-pressed={on}
+              onClick={(e) => {
+                e.stopPropagation()
+                d.toggleAvail(a)
+              }}
+              className={`rounded-full border px-4 py-2 text-[15px] font-medium transition-all ${on ? 'border-violet bg-violet/25 text-snow shadow-[0_0_24px_-4px_rgba(139,92,246,0.8)]' : 'border-line text-silver hover:border-violet/50 hover:text-snow'}`}
+            >
+              {a}
+            </button>
+          )
+        })}
+      </div>
+      <div className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-navy/70 px-4 py-2 text-[15px] text-snow">
+        Filter by date <ArrowRight size={16} className="text-violet-soft" /> the organiser’s own registration page <ExternalLink size={14} className="text-silver" />
+      </div>
+    </div>
   )
 }

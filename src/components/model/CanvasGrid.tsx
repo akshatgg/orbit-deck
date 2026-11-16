@@ -1,9 +1,23 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { canvasBoxes, riskiest, type CanvasBox, type CanvasId } from '../../data/canvas'
+import { canvasBoxes, riskiest, statusLabel, type CanvasBox, type CanvasId } from '../../data/canvas'
 import { statusMeta } from '../../data/evidence'
-import { EvidenceTag, StatusPill, ease } from '../ui'
+import { EvidenceTag, ease } from '../ui'
+
+/** Status pill using this chapter's wording (Partial / Untested guess). */
+export function GuessPill({ status }: { status: CanvasBox['status'] }) {
+  const colour = statusMeta[status].color
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+      style={{ borderColor: `color-mix(in srgb, ${colour} 45%, transparent)`, color: colour, background: `color-mix(in srgb, ${colour} 10%, transparent)` }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: colour }} />
+      {statusLabel(status)}
+    </span>
+  )
+}
 
 /** Placement on the 10-column Lean Canvas grid (lg and up). Below lg the boxes stack. */
 const place: Record<CanvasId, string> = {
@@ -29,9 +43,9 @@ export function CanvasGrid({
   compact,
 }: {
   view: CanvasView
-  /** Dim everything except the riskiest-assumption boxes. */
+  /** Dim everything except the riskiest-guess boxes. */
   risk: boolean
-  /** Outline the riskiest-assumption boxes without dimming. */
+  /** Outline the riskiest-guess boxes without dimming. */
   ringRisk?: boolean
   onOpen: (id: CanvasId) => void
   compact: boolean
@@ -62,7 +76,7 @@ function Box({ b, i, current, dim, ring, onOpen, compact, className }: { b: Canv
         e.stopPropagation()
         onOpen(b.id)
       }}
-      aria-label={`${b.n}. ${b.name}: ${current ? `${statusMeta[b.status].label}. ${b.current}` : b.initial}. Open details.`}
+      aria-label={`${b.n}. ${b.name}: ${current ? `${statusLabel(b.status)}. ${b.current}` : b.initial}. Open details.`}
       initial={false}
       animate={{ opacity: dim ? 0.28 : 1 }}
       transition={{ duration: 0.5, ease }}
@@ -96,7 +110,7 @@ function Box({ b, i, current, dim, ring, onOpen, compact, className }: { b: Canv
       </div>
       <div className="mt-1.5 flex h-6 items-center justify-between">
         <motion.span initial={false} animate={{ opacity: current ? 1 : 0, y: current ? 0 : 4 }} transition={{ duration: 0.5, ease, delay: current ? 0.15 + i * 0.07 : 0 }} aria-hidden={!current}>
-          <StatusPill status={b.status} />
+          <GuessPill status={b.status} />
         </motion.span>
         {!current && <span className="font-mono text-[10px] uppercase tracking-wider text-dim">Hypothesis</span>}
         <span className="font-mono text-[10px] uppercase tracking-wider text-dim opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">Details</span>
@@ -110,14 +124,14 @@ export function DetailFields({ b }: { b: CanvasBox }) {
     { t: 'Our working hypothesis', body: b.hypothesis },
     { t: 'Evidence currently available', body: b.evidence },
     { t: 'Next experiment', body: b.nextExperiment, tag: 'proposed' },
-    { t: 'What would change the assumption', body: b.wouldChange },
+    { t: 'What would change the guess', body: b.wouldChange },
   ]
   return (
     <div className="space-y-4">
       <div>
         <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-dim">Evidence status</div>
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <StatusPill status={b.status} />
+          <GuessPill status={b.status} />
           <span className="text-sm text-silver">{statusMeta[b.status].meaning}</span>
         </div>
         <p className="mt-1.5 text-sm leading-relaxed text-silver">{b.statusWhy}</p>

@@ -10,7 +10,7 @@ import { defaultSpeakers, type PresenterId, presenterIds } from '../data/team'
  * Presentation, PresenterPanel and Rehearsal view in sync (including across tabs via
  * the `storage` event).
  */
-const KEY = 'orbit-pitch-rehearsal-v1'
+const KEY = 'orbit-pitch-rehearsal-v2-13min'
 
 interface Stored {
   targetMin: number

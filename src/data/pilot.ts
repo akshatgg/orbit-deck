@@ -7,15 +7,33 @@ import type { Learning } from './evidence'
 
 export const pilotDisclaimer = 'This is a proposed decision system, not a report of completed pilot results.'
 
-export const pilotSequence = [
-  'Identify budget owner',
-  'Agree pilot fee and renewal criteria',
-  'Obtain authorised data access',
-  'Establish baseline',
-  'Recruit eligible cohort',
-  'Observe behaviour',
-  'Evaluate attendance and reliability',
-  'Decide',
+export type PilotPhaseId = 'yes' | 'before' | 'run' | 'decide'
+
+/** The four phases the journey is grouped into. `from`/`count` index into pilotSequence. */
+export const pilotPhases: { id: PilotPhaseId; label: string; from: number; count: number }[] = [
+  { id: 'yes', label: 'Get to yes', from: 0, count: 3 },
+  { id: 'before', label: 'Before launch', from: 3, count: 1 },
+  { id: 'run', label: 'Run', from: 4, count: 2 },
+  { id: 'decide', label: 'Decide', from: 6, count: 2 },
+]
+
+/** The eight proposed stages, in order. `line` is the one short line shown on the slide. */
+export const pilotSequence: { id: string; title: string; line: string; detail: string }[] = [
+  { id: 'champion', title: 'Secure a Careers Champion', line: 'An internal sponsor inside Imperial Careers.', detail: 'An internal champion in Imperial Careers who sponsors the initiative.' },
+  { id: 'ict', title: 'Obtain ICT Approval', line: 'Technical, data-protection and due-diligence checks.', detail: 'Technical, integration, data protection and due-diligence requirements are met.' },
+  { id: 'budget', title: 'Secure Budget Owner Approval', line: 'The budget holder approves the paid pilot.', detail: 'The budget holder approves the paid pilot.' },
+  { id: 'baseline', title: 'Establish a Baseline', line: 'Measure current performance before Orbit.', detail: 'Measure current performance before Orbit is introduced.' },
+  { id: 'launch', title: 'Launch the Pilot', line: 'Paid and controlled: 8–12 weeks, an agreed cohort.', detail: 'A controlled, paid 8–12 week pilot with an agreed student cohort.' },
+  { id: 'measure', title: 'Measure Performance', line: 'Collect data against agreed success metrics.', detail: 'Collect data against the agreed success metrics.' },
+  { id: 'evaluate', title: 'Evaluate Results', line: 'Compare with the baseline against agreed criteria.', detail: 'Compare results with the baseline against the agreed success criteria.' },
+  { id: 'decision', title: 'Make a Subscription Decision', line: 'One decision, three outcomes.', detail: 'Full subscription, iterate and retest, or discontinue.' },
+]
+
+/** The three-way decision fork at the end of the journey (proposed outcomes, not predictions). */
+export const pilotDecisions: { id: string; label: string; line: string }[] = [
+  { id: 'subscribe', label: 'Subscribe', line: 'Full subscription' },
+  { id: 'iterate', label: 'Iterate & retest', line: 'One controlled retest' },
+  { id: 'discontinue', label: 'Discontinue', line: 'Stop or pivot' },
 ]
 
 /** Funnel thresholds (percent, integers). */

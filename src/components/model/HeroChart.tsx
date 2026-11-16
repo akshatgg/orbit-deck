@@ -3,17 +3,16 @@ import { finYears, gbp, milestones } from '../../data/financials'
 import { ease } from '../ui'
 
 const W = 960
-const H = 330
 const M = { l: 62, r: 20, t: 22, b: 58 }
 const YMIN = -110_000
 const YMAX = 700_000
-const y = (v: number) => M.t + ((YMAX - v) / (YMAX - YMIN)) * (H - M.t - M.b)
 const slot = (W - M.l - M.r) / finYears.length
 const cx = (i: number) => M.l + slot * (i + 0.5)
 const ticks = [0, 200_000, 400_000, 600_000]
 
 /** Present-mode hero: revenue bars grow, the EBITDA line draws, 2029 lights up. Mounts fresh on each step entry. */
-export default function HeroChart() {
+export default function HeroChart({ h: H = 330 }: { h?: number }) {
+  const y = (v: number) => M.t + ((YMAX - v) / (YMAX - YMIN)) * (H - M.t - M.b)
   const path = finYears.map((d, i) => `${i === 0 ? 'M' : 'L'}${cx(i)},${y(d.ebitda)}`).join(' ')
   const i29 = finYears.findIndex((d) => d.year === milestones.firstProfitableYear)
 

@@ -36,6 +36,12 @@ export function useOrbitDemo() {
   const [sort, setSort] = useState<'relevance' | 'soonest'>('relevance')
   const [saved, setSaved] = useState<string[]>([])
   const [calDay, setCalDay] = useState(0)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  /** Present mode: hide the 'no interests yet' hint and emphasise one benefit on the cards. */
+  const [showHint, setShowHint] = useState(true)
+  /** Present mode: the filter panel shows the date row only. */
+  const [dateOnlyFilters, setDateOnlyFilters] = useState(false)
+  const [spotlight, setSpotlight] = useState<'source' | 'match' | null>(null)
 
   const university = universities.find((u) => u.id === uni)!
   const hasPrefs = prefs.topics.length + prefs.formats.length + prefs.availability.length > 0
@@ -72,7 +78,16 @@ export function useOrbitDemo() {
     university,
     setUni,
     prefs,
+    setPrefs,
     hasPrefs,
+    filtersOpen,
+    setFiltersOpen,
+    showHint,
+    dateOnlyFilters,
+    setDateOnlyFilters,
+    setShowHint,
+    spotlight,
+    setSpotlight,
     toggleTopic: useCallback((t: Topic) => setPrefs((p) => ({ ...p, topics: toggle(p.topics, t) })), []),
     toggleFormat: useCallback((f: EventFormat) => setPrefs((p) => ({ ...p, formats: toggle(p.formats, f) })), []),
     toggleAvail: useCallback((a: Availability) => setPrefs((p) => ({ ...p, availability: toggle(p.availability, a) })), []),

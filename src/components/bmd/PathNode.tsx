@@ -107,10 +107,17 @@ export function PathNode({ m, state, variant, index, size = 'lg' }: { m: Revenue
                     {m.uncertaintyShort}
                   </p>
                 ) : (
-                  <div
-                    className={`mt-3 inline-flex rounded-full border px-3.5 py-1 text-[15px] font-medium ${lead ? 'border-violet/60 bg-violet/20 text-violet-soft' : 'border-dashed border-silver/50 text-silver'}`}
-                  >
-                    {m.verdictShort}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <div
+                      className={`inline-flex rounded-full border px-3.5 py-1 text-[15px] font-medium ${lead ? 'border-violet/60 bg-violet/20 text-violet-soft' : 'border-dashed border-silver/50 text-silver'}`}
+                    >
+                      {m.verdictShort}
+                    </div>
+                    {lead && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/50 bg-amber/10 px-3 py-1 text-[13px] font-medium text-amber">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber" /> Untested guess
+                      </span>
+                    )}
                   </div>
                 )}
               </>

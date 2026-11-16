@@ -5,8 +5,8 @@ import EvidenceLadder from '../components/validation/EvidenceLadder'
 import ImperialJourney from '../components/validation/ImperialJourney'
 import PrototypeDrawer from '../components/validation/PrototypeDrawer'
 import { Hero, PresentHeader } from '../components/validation/PitchKit'
-import { JourneyPath, LadderViz, OrbitMap, UnknownChips } from '../components/validation/PitchEngagement'
-import { Accent, Card, ChapterHeader, EvidenceTag, LearningCard, LearningStrip, Reveal, SourceNote, Stage, StageLabel, ease } from '../components/ui'
+import { LadderViz, OrbitMap } from '../components/validation/PitchEngagement'
+import { Accent, Card, ChapterHeader, EvidenceTag, LearningCard, LearningStrip, SourceNote, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { engagementLearning, imperialContact, otherStudentAccounts, otherStudentDisclaimer, whatRemainsUnknown, whatWeLearned } from '../data/engagement'
 import { engagementShort, engagementStrip } from '../data/validationPresent'
@@ -126,52 +126,47 @@ export default function Ch11MarketEngagement({ mode, step }: ChapterProps) {
       <PresentHeader stage={meta.stage} num={meta.num} kicker={meta.title} title="We took Orbit *beyond our own team.*" />
       <div className="mt-5 min-h-[27.5rem]">
         <AnimatePresence mode="wait" initial={false}>
-          {step <= 1 && (
+          {step === 0 && (
             <Panel key="map">
-              <div className="grid items-center gap-6 lg:grid-cols-[1.45fr_1fr]">
-                <div>
-                  <OrbitMap showOthers={step >= 1} />
+              <div className="grid items-center gap-6 lg:grid-cols-[1.35fr_1fr]">
+                <OrbitMap showOthers />
+                <div className="space-y-4">
+                  <Hero>
+                    Same problem elsewhere. <Accent>One Imperial contact welcomed a demo.</Accent>
+                  </Hero>
+                  <div className="space-y-2.5">
+                    <div className="rounded-xl border border-ev-reported/40 bg-ev-reported/5 px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[clamp(1.05rem,1.35vw,1.35rem)] font-semibold text-snow">{engagementShort.imperialTitle}</span>
+                        <EvidenceTag label="reported" />
+                      </div>
+                      <p className="mt-1 text-[16px] leading-snug text-silver">
+                        {engagementShort.imperialLine} <span className="text-amber">{engagementShort.imperialTag}.</span>
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-dashed border-silver/40 px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[clamp(1.05rem,1.35vw,1.35rem)] font-semibold text-snow">{engagementShort.othersTitle}</span>
+                        <EvidenceTag label="observed" text="Student accounts" />
+                      </div>
+                      <p className="mt-1 text-[16px] leading-snug text-silver">
+                        {engagementShort.othersLine} <span className="text-amber">{engagementShort.othersTag}.</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <AnimatePresence mode="wait" initial={false}>
-                  {step === 0 ? (
-                    <motion.div key="s0" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease }} className="space-y-4">
-                      <Hero>
-                        One Imperial contact <Accent>welcomed the demonstration.</Accent>
-                      </Hero>
-                      <span className="inline-block rounded-full border border-amber/50 bg-amber/10 px-3.5 py-1 text-[15px] text-amber">{engagementShort.step0Tag}</span>
-                    </motion.div>
-                  ) : (
-                    <motion.div key="s1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease }} className="space-y-4">
-                      <EvidenceTag label="observed" />
-                      <Hero>
-                        Same problem, <Accent>elsewhere.</Accent>
-                      </Hero>
-                      <p className="border-l-2 border-amber/70 pl-3 text-[clamp(1rem,1.25vw,1.2rem)] leading-snug text-snow">{engagementShort.step1Line}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
-              {step >= 1 && <SourceNote className="mt-1">Not geographic · S3, S4</SourceNote>}
+              <SourceNote className="mt-1">Abstract diagram, not geographic · S3, S4</SourceNote>
             </Panel>
           )}
-          {step === 2 && (
-            <Panel key="journey">
-              <Hero className="mb-7">
-                Two happened. <Accent>The rest is open.</Accent>
-              </Hero>
-              <JourneyPath />
-              <div className="mt-8">
-                <UnknownChips />
-              </div>
-            </Panel>
-          )}
-          {step >= 3 && (
+          {step >= 1 && (
             <Panel key="ladder">
               <div className="grid items-center gap-6 lg:grid-cols-[0.8fr_1.2fr]">
                 <div className="space-y-4">
                   <Hero size="lg">
-                    Three rungs lit. <Accent>Three still dark.</Accent>
+                    Early signals. <Accent>No pilot, no payment.</Accent>
                   </Hero>
+                  <p className="text-[clamp(1rem,1.3vw,1.3rem)] leading-snug text-silver">{engagementShort.ladderNote}</p>
                 </div>
                 <LadderViz />
               </div>
@@ -180,11 +175,6 @@ export default function Ch11MarketEngagement({ mode, step }: ChapterProps) {
           )}
         </AnimatePresence>
       </div>
-      {step === 2 && (
-        <Reveal className="mt-3">
-          <SourceNote>Reported · S3, S4</SourceNote>
-        </Reveal>
-      )}
     </Stage>
   )
 }

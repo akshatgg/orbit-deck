@@ -1,8 +1,8 @@
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Check, Cpu, Handshake, HelpCircle, Timer } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight, Cpu, Handshake, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Accent, Button, EvidenceTag, Logo, Reveal, SplitHeadline, StatusPill, ease } from '../ui'
-import { assumptions, trackerVerdict } from '../../data/assumptions'
+import { assumptionsFootnote, assumptions, trackerVerdict, type Assumption } from '../../data/assumptions'
 import type { EvidenceLabel } from '../../data/evidence'
 import { statusMeta } from '../../data/evidence'
 import { team } from '../../data/team'
@@ -142,7 +142,7 @@ export function TrackerSummary({ show, detail = false }: { show: boolean; detail
     <Reveal show={show} delay={0.3}>
       <div className="glass rounded-2xl p-5">
         <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-violet-soft">Assumption tracker</div>
-        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6" role="group" aria-label="Assumptions A1 to A6">
+        <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-8" role="group" aria-label="Assumptions A1 to A8">
           {assumptions.map((a) => {
             const c = statusMeta[a.status].color
             const on = sel === a.id
@@ -211,67 +211,115 @@ export function Finale({ openingQuestion, closing }: { openingQuestion: string; 
   )
 }
 
-/* ================= Pass 2: Present-mode pitch components ================= */
+/* ================= Pass 3: Present-mode components ================= */
 
-const punchKnown: Item[] = [
-  { text: 'Discovery friction is real in our sample', tag: 'observed' },
-  { text: 'One discovery layer looks plausible', tag: 'proposed' },
-  { text: 'Imperial opens research access', tag: 'reported' },
-  { text: 'A route to viability, on paper', tag: 'modelled' },
-]
-const punchUnknown = ['Will students come back?', 'Does it lift verified attendance?', 'Can integrations scale economically?', 'Will universities pay and renew?']
-const punchDo = [
-  { icon: Timer, text: '8–12 week pilot' },
-  { icon: Check, text: 'Thresholds set in advance' },
-  { icon: Check, text: 'Verified attendance, paid renewal' },
-]
-const punchText = 'text-[clamp(1.1rem,1.5vw,1.5rem)] leading-snug text-snow'
+/** True a moment after mount, so Reveals inside a freshly mounted view animate in (staggered, no clicks). */
+function useEntered(delayMs = 60) {
+  const [on, setOn] = useState(false)
+  useEffect(() => {
+    const t = window.setTimeout(() => setOn(true), delayMs)
+    return () => window.clearTimeout(t)
+  }, [delayMs])
+  return on
+}
 
-/** Steps 1–3 in Present mode: short punchy lines, max 4 per column. */
-export function ThreeColumnsPunchy({ s1, s2, s3 }: { s1: boolean; s2: boolean; s3: boolean }) {
+const label = (a: Assumption) => a.statusText.split(':')[0]
+const detail = (a: Assumption) => a.statusText.split(':').slice(1).join(':').trim()
+
+function AssumptionRow({ a, show, delay, detailed, stretch }: { a: Assumption; show: boolean; delay: number; detailed: boolean; stretch?: boolean }) {
+  const c = statusMeta[a.status].color
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      <Column kicker="Established, with limits" title="What we know" color="var(--color-ev-observed)" show={s1}>
-        <ul className="space-y-2.5">
-          {punchKnown.map((k, i) => (
-            <Reveal as="li" key={k.text} show={s1} delay={0.15 + i * 0.1} className={punchText}>
-              {k.tag && <EvidenceTag label={k.tag} className="mb-1" />}
-              <div>{k.text}</div>
-            </Reveal>
-          ))}
-        </ul>
-      </Column>
-      <Column kicker="Open questions" title="What we do not know" color="var(--color-amber)" show={s2}>
-        <ul className="space-y-3">
-          {punchUnknown.map((u, i) => (
-            <Reveal as="li" key={u} show={s2} delay={0.15 + i * 0.1} className={`flex gap-3 ${punchText}`}>
-              <HelpCircle size={22} className="mt-1 shrink-0 text-amber" />
-              {u}
-            </Reveal>
-          ))}
-        </ul>
-      </Column>
-      <Column kicker="Proposed next step" title="What we should do" color="var(--color-ev-proposed)" show={s3}>
-        <p className="font-serif text-[clamp(1.9rem,3.2vw,3.2rem)] italic leading-[1.05] text-violet-soft" style={{ textShadow: '0 0 40px rgb(139 92 246 / 0.4)' }}>
-          Run one paid university pilot.
-        </p>
-        <ul className="mt-5 space-y-2.5">
-          {punchDo.map((d, i) => (
-            <Reveal as="li" key={d.text} show={s3} delay={0.3 + i * 0.1} className={`flex items-center gap-3 ${punchText}`}>
-              <d.icon size={20} className="shrink-0 text-ev-proposed" />
-              {d.text}
-            </Reveal>
-          ))}
-        </ul>
-        <div className="mt-4">
-          <EvidenceTag label="proposed" />
+    <Reveal show={show} delay={delay} className={stretch ? 'flex-1' : ''}>
+      <div
+        className="flex h-full items-center gap-4 rounded-2xl border px-4 py-2.5 sm:px-5"
+        style={{
+          borderColor: `color-mix(in srgb, ${c} 38%, transparent)`,
+          background: `linear-gradient(90deg, color-mix(in srgb, ${c} 13%, transparent), color-mix(in srgb, ${c} 3%, transparent))`,
+          boxShadow: `inset 3px 0 0 ${c}`,
+        }}
+      >
+        <span className="num w-11 shrink-0 text-[clamp(1.35rem,2vw,1.9rem)] font-semibold leading-none" style={{ color: c, textShadow: `0 0 22px color-mix(in srgb, ${c} 55%, transparent)` }}>
+          {a.id}
+        </span>
+        <div className="min-w-0">
+          <div className="text-[clamp(1.1rem,1.65vw,1.55rem)] font-semibold leading-tight tracking-tight text-snow">{a.title}</div>
+          <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-[clamp(0.9rem,1.1vw,1.05rem)] leading-snug">
+            <span className="font-semibold" style={{ color: c }}>
+              {label(a)}
+            </span>
+            {detailed && detail(a) && <span className="text-silver">{detail(a)}</span>}
+          </div>
         </div>
-      </Column>
+      </div>
+    </Reveal>
+  )
+}
+
+function ColumnHead({ title, n, color }: { title: string; n: number; color: string }) {
+  return (
+    <div className="mb-2.5 flex items-baseline justify-between gap-3 border-b pb-2" style={{ borderColor: `color-mix(in srgb, ${color} 40%, transparent)` }}>
+      <h3 className="text-[clamp(1.15rem,1.7vw,1.6rem)] font-semibold tracking-tight text-snow">{title}</h3>
+      <span className="num shrink-0 font-mono text-sm" style={{ color }}>
+        {n} of {assumptions.length}
+      </span>
     </div>
   )
 }
 
-/** Step 4 hero: the biggest moment of the deck. */
+/**
+ * The report's "Orbit's business model has 8 key assumptions" slide: evidence gathered versus
+ * untested. Present mode staggers the rows in on arrival (≈1.2 s); no extra clicks.
+ */
+export function AssumptionsSlide({ animate = false }: { animate?: boolean }) {
+  const entered = useEntered()
+  const show = animate ? entered : true
+  const ev = assumptions.filter((a) => a.group === 'evidence')
+  const pilot = assumptions.filter((a) => a.group === 'pilot')
+  const imperial = pilot.filter((a) => a.imperial)
+  const rest = pilot.filter((a) => !a.imperial)
+  const untestedColor = statusMeta.untested.color
+  let k = 0
+  const d = () => 0.05 + 0.075 * k++
+  return (
+    <div className="grid gap-5 lg:grid-cols-2 lg:gap-7">
+      <section aria-label="Evidence gathered" className="flex flex-col">
+        <ColumnHead title="Evidence gathered" n={ev.length} color="var(--color-st-supported)" />
+        <div className="flex flex-1 flex-col gap-2.5">
+          {ev.map((a) => (
+            <AssumptionRow key={a.id} a={a} show={show} delay={d()} detailed stretch />
+          ))}
+        </div>
+      </section>
+
+      <section aria-label="Untested: pilot evidence needed" className="flex flex-col">
+        <ColumnHead title="Untested: pilot evidence needed" n={pilot.length} color={untestedColor} />
+        <div className="flex flex-col gap-2.5">
+          {/* A3 and A4 are grouped together: explored with Imperial, still to be validated */}
+          <div className="relative mt-2 flex flex-col gap-2.5 rounded-[1.25rem] border-2 border-dashed border-ev-proposed/60 bg-ev-proposed/[0.04] p-2.5 pt-4">
+            <Reveal show={show} delay={0.05 + 0.075 * k} className="absolute -top-3 left-5">
+              <span className="inline-block rounded-full border border-ev-proposed/60 bg-ink px-3 py-0.5 font-mono text-[11.5px] uppercase tracking-[0.12em] text-violet-soft">Partially tested with Imperial</span>
+            </Reveal>
+            {imperial.map((a) => (
+              <AssumptionRow key={a.id} a={a} show={show} delay={d()} detailed={false} />
+            ))}
+          </div>
+          {rest.map((a) => (
+            <AssumptionRow key={a.id} a={a} show={show} delay={d()} detailed={false} />
+          ))}
+        </div>
+      </section>
+
+      <Reveal show={show} delay={0.05 + 0.075 * 9} className="lg:col-span-2">
+        <p className="flex items-start gap-2 text-[clamp(0.9rem,1.05vw,1.05rem)] leading-snug text-silver">
+          <Info size={15} className="mt-[3px] shrink-0 text-dim" aria-hidden />
+          <span>{assumptionsFootnote}</span>
+        </p>
+      </Reveal>
+    </div>
+  )
+}
+
+/** Step 1 hero: the biggest moment of the deck. */
 export function VerdictHero() {
   const reduce = useReducedMotion()
   return (
@@ -291,152 +339,73 @@ export function VerdictHero() {
         >
           <SplitHeadline text="CONDITIONAL GO" delay={0.15} />
         </motion.div>
-        <Reveal delay={0.9} className="mt-4">
-          <p className="font-serif text-[clamp(1.3rem,2.5vw,2.3rem)] italic leading-tight text-snow">Pursue the next experiment, not the expansion plan.</p>
+        <Reveal delay={0.55} className="mt-4">
+          <p className="font-serif text-[clamp(1.3rem,2.5vw,2.3rem)] italic leading-tight text-snow">One paid, measurable pilot before wider expansion.</p>
         </Reveal>
       </div>
     </div>
   )
 }
 
-/** Step 4: compact team + roles. */
-export function TeamRolesCompact() {
-  const names = Object.values(team)
-  const roleList = [
-    { icon: Cpu, title: 'Technical owner' },
-    { icon: Handshake, title: 'Commercial owner' },
-  ]
+const owners = [
+  { icon: Cpu, title: 'Technical owner', body: 'Integrations, reliability, data governance' },
+  { icon: Handshake, title: 'Commercial owner', body: 'Institutional sales, procurement, customer success' },
+]
+
+/** Step 1: who owns the pilot, compactly — two roles, not all six team members. */
+export function OwnersCompact() {
   return (
-    <Reveal delay={1.1} className="h-full">
-      <div className="glass flex h-full flex-col rounded-2xl p-4 text-left">
-        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-violet-soft">Who should pursue it</div>
-        <div className="mt-2.5 flex flex-wrap gap-2">
-          {roleList.map((r) => (
-            <span key={r.title} className="inline-flex items-center gap-2 rounded-xl border border-dashed border-ev-proposed/60 bg-ev-proposed/5 px-3 py-2 text-lg font-semibold text-snow">
-              <r.icon size={18} className="text-ev-proposed" /> {r.title}
-            </span>
+    <Reveal delay={0.7}>
+      <div className="mx-auto max-w-3xl text-left">
+        <div className="text-center font-mono text-[11px] uppercase tracking-[0.16em] text-violet-soft">Who owns it</div>
+        <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
+          {owners.map((o) => (
+            <div key={o.title} className="flex items-start gap-3 rounded-2xl border border-dashed border-ev-proposed/60 bg-ev-proposed/5 px-4 py-3">
+              <o.icon size={22} className="mt-0.5 shrink-0 text-ev-proposed" />
+              <div>
+                <div className="text-lg font-semibold leading-tight text-snow">{o.title}</div>
+                <p className="mt-0.5 text-[15px] leading-snug text-silver">{o.body}</p>
+              </div>
+            </div>
           ))}
         </div>
-        <p className="mt-2.5 text-[13px] leading-snug text-silver">{names.map((n) => n.short).join(' · ')}</p>
-        <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-dim">Academic team · not the founder structure · roles unnamed</p>
+        <p className="mt-2 text-center font-mono text-[10.5px] uppercase tracking-[0.12em] text-dim">Proposed structure · two roles, not all six team members</p>
       </div>
     </Reveal>
   )
 }
 
-/** Step 4: A1–A6 as status chips. */
-export function AssumptionChips() {
-  const [sel, setSel] = useState<string | null>(null)
-  const active = assumptions.find((a) => a.id === sel)
+/** Step 2: return to the opening question and answer it. Static: no timers, staggered in over ~1.3 s. */
+export function FinaleStatic({ openingQuestion, onEvidence, tagline }: { openingQuestion: string; onEvidence: () => void; tagline: string }) {
+  const entered = useEntered()
   return (
-    <Reveal delay={1.25} className="h-full">
-      <div className="glass flex h-full flex-col rounded-2xl p-4 text-left">
-        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-violet-soft">Assumption tracker</div>
-        <div className="mt-2.5 grid grid-cols-6 gap-2" role="group" aria-label="Assumptions A1 to A6">
-          {assumptions.map((a) => {
-            const c = statusMeta[a.status].color
-            const on = sel === a.id
-            return (
-              <button
-                key={a.id}
-                type="button"
-                aria-pressed={on}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setSel(on ? null : a.id)
-                }}
-                className="lift flex flex-col items-center gap-0.5 rounded-xl border px-1 py-1.5"
-                style={{ borderColor: `color-mix(in srgb, ${c} ${on ? 90 : 45}%, transparent)`, background: `color-mix(in srgb, ${c} ${on ? 18 : 8}%, transparent)` }}
-                title={`${a.id} · ${a.claim} (${statusMeta[a.status].label})`}
-              >
-                <span className="num text-lg font-semibold" style={{ color: c }}>{a.id}</span>
-                <span className="text-[10.5px] leading-none text-silver">{statusMeta[a.status].label}</span>
-              </button>
-            )
-          })}
-        </div>
-        <div className="mt-2 min-h-[2.4rem] text-[13.5px] leading-snug text-silver" aria-live="polite">
-          {active ? (
-            <>
-              <span className="text-snow">{active.claim}</span> {active.statusText}.
-            </>
-          ) : (
-            <span className="font-serif text-lg italic text-snow">{trackerVerdict}</span>
-          )}
-        </div>
-      </div>
-    </Reveal>
-  )
-}
-
-/** Step 5: cinematic finale — question fades to the answer, then the closing line, logo and call to action. */
-export function FinaleCinematic({ openingQuestion, onEvidence, tagline }: { openingQuestion: string; onEvidence: () => void; tagline: string }) {
-  const reduce = useReducedMotion()
-  const [phase, setPhase] = useState(reduce ? 2 : 0)
-  useEffect(() => {
-    if (reduce) {
-      setPhase(2)
-      return
-    }
-    const t1 = window.setTimeout(() => setPhase(1), 2800)
-    const t2 = window.setTimeout(() => setPhase(2), 5600)
-    return () => {
-      window.clearTimeout(t1)
-      window.clearTimeout(t2)
-    }
-  }, [reduce])
-  const fade = { initial: { opacity: 0, y: 16, filter: 'blur(10px)' }, animate: { opacity: 1, y: 0, filter: 'blur(0px)' }, exit: { opacity: 0, y: -14, filter: 'blur(10px)', transition: { duration: 0.4, ease } }, transition: { duration: 0.9, ease } }
-  return (
-    <div className="relative mx-auto flex min-h-[420px] w-full max-w-5xl flex-col items-center justify-center text-center">
-      <AnimatePresence mode="wait" initial={false}>
-        {phase === 0 && (
-          <motion.div key="q" {...fade}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-dim">The question we started with</div>
-            <p className="mt-4 font-serif text-[clamp(2rem,4.2vw,4.2rem)] italic leading-[1.1] text-silver">{openingQuestion}</p>
-          </motion.div>
-        )}
-        {phase === 1 && (
-          <motion.div key="a" {...fade}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-violet-soft">Where we are now</div>
-            <p className="mt-4 text-[clamp(2rem,4.6vw,4.6rem)] font-semibold leading-[1.05] tracking-[-0.025em] text-snow">
-              Enough evidence to test. <Accent>Not yet to scale.</Accent>
-            </p>
-          </motion.div>
-        )}
-        {phase === 2 && (
-          <motion.div key="end" {...fade} className="flex flex-col items-center">
-            <p className="text-[clamp(1.6rem,3.2vw,3.2rem)] font-medium leading-[1.1] tracking-[-0.02em] text-snow">
-              <SplitHeadline text="Good ventures are not built by believing harder." />
-            </p>
-            <p className="mt-2 text-[clamp(1.9rem,4.2vw,4.2rem)] leading-[1.1]">
-              <SplitHeadline text="*They are built by learning better.*" delay={0.5} />
-            </p>
-            <Reveal delay={1.3} className="mt-9 flex flex-col items-center gap-3">
-              <span className="rounded-full" style={{ filter: 'drop-shadow(0 0 22px rgb(139 92 246 / 0.9)) drop-shadow(0 0 50px rgb(56 189 248 / 0.4))' }}>
-                <Logo size={52} />
-              </span>
-              <p className="text-[clamp(1.2rem,1.8vw,1.7rem)] text-snow">{tagline}</p>
-            </Reveal>
-            <Reveal delay={1.6} className="mt-5">
-              <Button size="lg" onClick={onEvidence}>
-                Explore our evidence <ArrowRight size={18} />
-              </Button>
-            </Reveal>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {phase < 2 && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            setPhase(2)
-          }}
-          className="absolute bottom-0 right-0 rounded-full px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-dim hover:text-snow"
-        >
-          Skip intro
-        </button>
-      )}
+    <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center text-center">
+      <Reveal show={entered}>
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-dim">The question we started with</div>
+        <p className="mt-3 font-serif text-[clamp(1.6rem,3vw,3rem)] italic leading-[1.15] text-silver">{openingQuestion}</p>
+      </Reveal>
+      <Reveal show={entered} delay={0.15} className="my-5">
+        <ArrowRight className="rotate-90 text-violet-soft" size={30} aria-hidden />
+      </Reveal>
+      <p className="text-[clamp(2rem,4.8vw,4.8rem)] font-semibold leading-[1.05] tracking-[-0.025em] text-snow">
+        <SplitHeadline text="We started believing in an idea." show={entered} delay={0.2} />
+        <br />
+        <SplitHeadline text="*We finish knowing how to test it.*" show={entered} delay={0.5} />
+      </p>
+      <Reveal show={entered} delay={0.8} className="mt-5">
+        <p className="text-[clamp(1.1rem,1.6vw,1.6rem)] text-silver">
+          Enough evidence to test. <Accent>Not yet to scale.</Accent>
+        </p>
+      </Reveal>
+      <Reveal show={entered} delay={0.95} className="mt-7 flex flex-col items-center gap-3">
+        <span className="rounded-full" style={{ filter: 'drop-shadow(0 0 22px rgb(139 92 246 / 0.9)) drop-shadow(0 0 50px rgb(56 189 248 / 0.4))' }}>
+          <Logo size={48} />
+        </span>
+        <p className="text-[clamp(1.1rem,1.6vw,1.6rem)] text-snow">{tagline}</p>
+        <Button size="lg" onClick={onEvidence}>
+          Explore our evidence <ArrowRight size={18} />
+        </Button>
+      </Reveal>
     </div>
   )
 }

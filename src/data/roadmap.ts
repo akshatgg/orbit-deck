@@ -94,6 +94,8 @@ export const externalBranch = {
   title: 'A separate strategic opportunity',
   when: 'After Year 5',
   idea: 'External-only city event discovery, in cities where Orbit already operates.',
+  /** The essential learning: two products, two businesses. */
+  separate: 'A university product and a public-events product are different businesses, with different customers and different economics.',
   advantages: [
     'Familiarity with local event ecosystems',
     'Existing discovery infrastructure',
@@ -113,10 +115,23 @@ export const externalBranch = {
   condition: 'Pursue it only if its own evidence justifies it.',
 }
 
-/** Present-mode chips for the post-Year-5 branch (full lists stay in Explore). */
-export const branchChips = {
-  title: 'External city events',
-  advantages: ['Local event knowledge', 'Existing discovery layer', 'Possible organiser ties'],
+/** Present-mode: the two businesses side by side (customer and economics differ). */
+export const twoBusinesses = {
+  line: 'Two products. Two different businesses.',
+  university: {
+    name: 'University product',
+    badge: 'In the five-year plan',
+    customer: 'Universities',
+    economics: 'Institutional subscription',
+    tag: 'modelled' as const,
+  },
+  events: {
+    name: 'Public-events product',
+    badge: 'Outside the forecast',
+    customer: 'Public users and organisers',
+    economics: 'Organiser commissions',
+    tag: 'unresolved' as const,
+  },
   risks: ['Users beyond universities', 'Organiser partnerships', 'Commission economics'],
-  line: 'One can succeed while the other fails.',
+  gate: 'Pursue only if its own evidence justifies it.',
 }

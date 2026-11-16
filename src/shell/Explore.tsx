@@ -26,9 +26,9 @@ interface Section {
 /** One-line purpose of each stage — process description only, no outcome claims. */
 const stageIntro: Record<StageId, string> = {
   ideation: 'Is this worth investigating at all? Start from an observation, state hypotheses, and screen the opportunity before spending anything on it.',
-  discovery: 'Replace our own beliefs with evidence: interviews and a survey, and the assumptions they forced us to change.',
+  discovery: 'Replace our own beliefs with evidence: interviews and a survey, and the product decisions they led to.',
   bmd: 'Turn what we learned into jobs, a proposition and a business model, and mark which parts are still assumption.',
-  validation: 'Take the idea beyond our team, stress-test the reasoning, and define the experiment that would justify going on.',
+  validation: 'Take the idea beyond our team, test the prototype with students, and define the pilot and gates that would justify going on.',
   verdict: 'Weigh what we know against what we do not, and decide what to do next.',
 }
 
@@ -37,9 +37,9 @@ export const sections: Section[] = [
   { id: 'overview', label: 'Overview', blocks: [] },
   { id: 'journey', label: 'Journey Map', blocks: [] },
   { id: 'ideation', label: '1 · Ideation & Screening', stage: 'ideation', blocks: [{ chapter: 'question' }, { chapter: 'origin' }, { chapter: 'screening' }] },
-  { id: 'discovery', label: '2 · Discovery', stage: 'discovery', blocks: [{ chapter: 'learning-before-building' }, { chapter: 'what-students-told-us' }, { chapter: 'assumptions-changed' }] },
+  { id: 'discovery', label: '2 · Discovery', stage: 'discovery', blocks: [{ chapter: 'what-students-told-us' }, { chapter: 'product-decisions' }] },
   { id: 'bmd', label: '3 · Business Model Design', stage: 'bmd', blocks: [{ chapter: 'jtbd' }, { chapter: 'product' }, { chapter: 'who-pays' }, { chapter: 'lean-canvas' }, { chapter: 'viability' }] },
-  { id: 'validation', label: '4 · Validation', stage: 'validation', blocks: [{ chapter: 'market-engagement' }, { chapter: 'coaching' }, { chapter: 'experiment' }, { chapter: 'scale' }] },
+  { id: 'validation', label: '4 · Validation', stage: 'validation', blocks: [{ chapter: 'market-engagement' }, { chapter: 'walkthroughs' }, { chapter: 'experiment' }, { chapter: 'gates' }, { chapter: 'scale' }] },
   { id: 'verdict', label: 'Final Evaluation', stage: 'verdict', blocks: [{ chapter: 'verdict' }] },
   { id: 'assumptions', label: 'Assumptions', blocks: [] },
   { id: 'evidence', label: 'Evidence Room', blocks: [] },
@@ -171,7 +171,7 @@ export function Explore({ section, go }: { section: string | null; go: (hash: st
           <Kicker>Assumption tracker</Kicker>
           <h2 className="t-h1 mt-4 max-w-4xl">What we believe, and what we can actually show.</h2>
           <p className="t-lead mt-4 max-w-3xl">
-            Six critical assumptions carry the case for Orbit. Only one is supported, and only within a convenience sample. Open any row for the evidence and the next test.
+            Eight key assumptions carry Orbit's business model, as set out in our report. One is supported, two have partial evidence, and five are untested until a pilot runs. Open any row for the evidence and the next test.
           </p>
           <div className="mt-10">
             <AssumptionTracker full />

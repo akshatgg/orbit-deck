@@ -1,7 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { Check, Minus } from 'lucide-react'
-import { imperialJourney, journeyStateMeta, ladder, otherStudentAccounts, whatRemainsUnknown, type RungState } from '../../data/engagement'
-import { journeyShortLabels } from '../../data/validationPresent'
+import { Minus } from 'lucide-react'
+import { ladder, otherStudentAccounts, type RungState } from '../../data/engagement'
 import { EvidenceTag, ease } from '../ui'
 
 const CX = 380
@@ -59,63 +58,6 @@ export function OrbitMap({ showOthers }: { showOthers: boolean }) {
         REPORTED
       </text>
     </svg>
-  )
-}
-
-/** Five glowing dots on a path: lit = happened, hollow = potential / possible / not yet reached. */
-export function JourneyPath() {
-  const reduce = useReducedMotion()
-  const lastHappened = imperialJourney.reduce((n, j, i) => (j.state === 'happened' ? i : n), 0)
-  const litPct = (lastHappened / (imperialJourney.length - 1)) * 80
-  return (
-    <div className="relative pt-2">
-      <div className="absolute left-[10%] right-[10%] top-[2.5rem] border-t-2 border-dashed border-silver/30" />
-      <motion.div
-        className="absolute left-[10%] top-[2.5rem] h-[3px] -translate-y-px origin-left rounded-full"
-        style={{ width: `${litPct}%`, background: 'linear-gradient(90deg, var(--color-ev-reported), #8b5cf6)', boxShadow: '0 0 22px 2px rgb(125 211 252 / 0.6)' }}
-        initial={{ scaleX: reduce ? 1 : 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1, ease, delay: 0.2 }}
-      />
-      <ol className="relative grid grid-cols-5">
-        {imperialJourney.map((j, i) => {
-          const m = journeyStateMeta[j.state]
-          const happened = j.state === 'happened'
-          return (
-            <motion.li key={j.id} className="flex list-none flex-col items-center text-center" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.1 + i * 0.12 }}>
-              <span
-                className="grid h-[3.25rem] w-[3.25rem] place-items-center rounded-full"
-                style={
-                  happened
-                    ? { background: 'var(--color-ev-reported)', color: '#06101f', boxShadow: '0 0 0 7px rgb(125 211 252 / 0.14), 0 0 44px 8px rgb(125 211 252 / 0.55)' }
-                    : { background: '#080d1a', border: `2px dashed ${m.color}`, color: m.color }
-                }
-              >
-                {happened ? <Check size={24} strokeWidth={3} /> : <span className="h-2 w-2 rounded-full opacity-0" />}
-              </span>
-              <div className={`mt-3 text-[clamp(1.05rem,1.5vw,1.5rem)] font-semibold leading-tight ${happened ? 'text-snow' : 'text-silver'}`}>{journeyShortLabels[j.id]}</div>
-              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: m.color }}>
-                {j.state === 'next' ? 'Not yet' : m.label}
-              </div>
-            </motion.li>
-          )
-        })}
-      </ol>
-    </div>
-  )
-}
-
-/** The unresolved unknowns as amber chips. */
-export function UnknownChips() {
-  return (
-    <div className="flex flex-wrap items-center gap-2.5">
-      <EvidenceTag label="unresolved" text="Still unknown" />
-      {whatRemainsUnknown.map((t, i) => (
-        <motion.span key={t} className="rounded-full border border-amber/50 bg-amber/10 px-3.5 py-1.5 text-[clamp(0.95rem,1.2vw,1.15rem)] text-amber" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.45, ease, delay: 0.7 + i * 0.07 }}>
-          {t}
-        </motion.span>
-      ))}
-    </div>
   )
 }
 

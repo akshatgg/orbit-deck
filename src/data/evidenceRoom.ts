@@ -20,7 +20,6 @@ export const categories = [
   { id: 'acquisition', label: 'Customer acquisition' },
   { id: 'financial', label: 'Financial model' },
   { id: 'engagement', label: 'Market engagement' },
-  { id: 'coaching', label: 'Coaching feedback' },
   { id: 'pilot', label: 'Pilot protocol' },
   { id: 'risks', label: 'Risks and stop conditions' },
   { id: 'expansion', label: 'Expansion strategy' },
@@ -82,7 +81,7 @@ export const cards: EvidenceCard[] = [
 
   /* ---- Research methodology ---- */
   {
-    id: 'method-1', category: 'method', chapter: 'learning-before-building',
+    id: 'method-1', category: 'method', chapter: 'what-students-told-us',
     claim: 'Discovery combined 13 interviews and 42 analysed survey responses.',
     evidence: 'Interviews were held 26–29 October 2026. Sequence: hypothesis, interviews, survey, compare findings, revise assumptions.',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
@@ -90,7 +89,7 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Baseline the problem within an eligible pilot cohort outside the team’s networks.',
   },
   {
-    id: 'method-2', category: 'method', chapter: 'learning-before-building',
+    id: 'method-2', category: 'method', chapter: 'what-students-told-us',
     claim: 'We asked about past behaviour, not hypothetical enthusiasm.',
     evidence: 'Questions included: the last event you wanted to attend but missed; how you first heard about it; what platforms you used; whether registration was still open; what prevented attendance; how you keep track of events. Recent behaviour is stronger evidence than enthusiasm; negative responses show where the opportunity may be weaker.',
     sources: ['S2', 'S4'], label: 'observed', status: 'supported',
@@ -98,7 +97,7 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Replace self-report with measured behaviour in the pilot (verified attendance).',
   },
   {
-    id: 'method-3', category: 'method', chapter: 'learning-before-building',
+    id: 'method-3', category: 'method', chapter: 'what-students-told-us',
     claim: 'The sample has material limitations that bound every research claim.',
     evidence: 'Small convenience sample; 27 of 42 respondents were Imperial Business School MSc students; self-reported; no representative population estimate; the survey introduction named Orbit; one interview involved leading prompts.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'inconclusive',
@@ -116,7 +115,7 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Repeat with students from other institutions and with an unbranded script.',
   },
   {
-    id: 'int-2', category: 'interviews', chapter: 'assumptions-changed',
+    id: 'int-2', category: 'interviews', chapter: 'product-decisions',
     claim: 'Students did not ask for one more app; the tool would need to be quicker than current habits.',
     evidence: '4 of 13 interviewees were wary of adopting another system. Anonymised quote: “It would need to be quicker than what I do now, otherwise there’s not much point.”',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
@@ -132,7 +131,7 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Observe what students stop using once Orbit is available (pilot).',
   },
   {
-    id: 'int-4', category: 'interviews', chapter: 'assumptions-changed',
+    id: 'int-4', category: 'interviews', chapter: 'product-decisions',
     claim: 'Several early beliefs were narrowed by the evidence: more apps, public aggregation, reminders, clash solving, adoption.',
     evidence: 'Five beliefs entered and each came out narrower: students did not want one more app; reminders were not the core job; some misses, such as timetable clashes, are not ours to solve.',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
@@ -174,7 +173,7 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Compare channel mix in a wider, non-Imperial sample.',
   },
   {
-    id: 'sv-5', category: 'survey', chapter: 'assumptions-changed',
+    id: 'sv-5', category: 'survey', chapter: 'product-decisions',
     claim: 'Reminders are secondary; timely discovery is the core need.',
     evidence: 'Forgetting accounted for 5 of 42 most-recent misses; hearing too late, deadlines and full events accounted for 23 of 42.',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
@@ -187,7 +186,7 @@ export const cards: EvidenceCard[] = [
     evidence: 'Synthesis of survey and interview evidence (key insight): students are not simply searching for more events.',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
     limitations: 'A synthesis from a small sample; problem evidence is not demand for this solution.',
-    nextTest: 'Prototype walkthrough (A5), then the paid pilot.',
+    nextTest: 'Product walkthroughs (A5), then the paid pilot.',
   },
 
   /* ---- Jobs-to-be-Done ---- */
@@ -219,8 +218,8 @@ export const cards: EvidenceCard[] = [
   },
   {
     id: 'canvas-2', category: 'canvas', chapter: 'lean-canvas',
-    claim: 'The riskiest assumption is that a university will pay and renew.',
-    evidence: 'Assumption A3 is untested commercially; A6 (repeat use, attendance improvement and institutional renewal) is untested.',
+    claim: 'The riskiest untested guess is that a university will pay and renew.',
+    evidence: 'A3 (universities pay) is untested, though partially tested with Imperial. Repeat use (A6), attendance (A7) and delivery margin (A8) are untested too.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'untested',
     limitations: 'Rank of “riskiest” is a team judgement.',
     nextTest: 'Paid pilot with paid-renewal criteria.',
@@ -230,7 +229,7 @@ export const cards: EvidenceCard[] = [
   {
     id: 'rev-1', category: 'revenue', chapter: 'who-pays',
     claim: 'University-funded SaaS is the working hypothesis, not a proven answer.',
-    evidence: 'A university subscription links institutional value to recurring revenue while keeping the product free for students. No path has purchasing evidence yet.',
+    evidence: 'A university subscription links institutional value to recurring revenue while keeping the product free for students. University subscription remains an untested guess; no revenue path has purchasing evidence yet.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'untested',
     limitations: 'An Imperial Careers contact welcomed a demonstration; interest does not establish willingness to pay and no price has been agreed.',
     nextTest: 'Agree a pilot fee with a named budget owner.',
@@ -246,8 +245,8 @@ export const cards: EvidenceCard[] = [
   {
     id: 'rev-3', category: 'revenue', chapter: 'who-pays',
     claim: 'Organiser commissions need paid-event volume and clean attribution that we do not yet have.',
-    evidence: 'Treated as a separate, later business model after the coaching session distinguished university and organiser products.',
-    sources: ['S3', 'S6'], label: 'unresolved', status: 'untested',
+    evidence: 'Treated as a separate, later business model: a university product and a public-events product have different customers and different economics.',
+    sources: ['S3'], label: 'unresolved', status: 'untested',
     limitations: 'No organiser commitments are recorded in the evidence supplied.',
     nextTest: 'Evidence of attributable paid registrations and commission economics, in the separate external-events evaluation.',
   },
@@ -259,10 +258,10 @@ export const cards: EvidenceCard[] = [
     evidence: 'Survey channels: friends 26, university emails 24, WhatsApp or social media 23, careers platforms 17, Students’ Union or societies 16, Eventbrite 7, Luma 6, Fatsoma 2, Handshake 2 (n = 42, multiple response). See the interactive comparison below.',
     sources: ['S3', 'S4'], label: 'proposed', status: 'untested',
     limitations: 'Capability descriptions are high-level and configuration-dependent, not a feature audit. We do not claim competitors lack personalisation or recommendations.',
-    nextTest: 'Pilot test of whether students find relevant events faster with Orbit than with their current mix of sources (A5).',
+    nextTest: 'Product walkthroughs (A5), then a pilot test of whether students find relevant events faster with Orbit than with their current mix of sources.',
   },
   {
-    id: 'comp-2', category: 'competitors', chapter: 'assumptions-changed',
+    id: 'comp-2', category: 'competitors', chapter: 'product-decisions',
     claim: 'Public event aggregation was narrowed out of the core proposition.',
     evidence: 'Eventbrite and Luma were used by few survey respondents (7 and 6 of 42); the dominant channels were people and university communications.',
     sources: ['S3', 'S4'], label: 'observed', status: 'supported',
@@ -281,16 +280,16 @@ export const cards: EvidenceCard[] = [
   },
   {
     id: 'tech-2', category: 'tech', chapter: 'market-engagement',
-    claim: 'University event data may be accessible, but authorised, reliable production integration is unvalidated (A4).',
+    claim: 'University event data may be accessible, but reliable, authorised integration (A4) is untested: partially tested with Imperial.',
     evidence: 'Symplicity reportedly provides live data; IB Connect may have a one-day feed delay. Integration could require ICT approval, due diligence and procurement. No authorised production integration exists.',
-    sources: ['S3', 'S4'], label: 'reported', status: 'inconclusive',
+    sources: ['S3', 'S4'], label: 'reported', status: 'untested',
     limitations: 'Statements are reported, not independently verified.',
     nextTest: 'Obtain authorised access for the pilot and measure at least 95% sampled listing accuracy.',
   },
   {
-    id: 'tech-3', category: 'tech', chapter: 'product',
-    claim: 'The prototype demonstrates the interaction; it does not yet show students can efficiently find relevant events (A5).',
-    evidence: 'A neutral walkthrough task is under way: “Find an event you would actually attend next week and show us how you would register.” No verified results are reported here.',
+    id: 'tech-3', category: 'tech', chapter: 'walkthroughs',
+    claim: 'Students finding value in Orbit (A5) is only partly established: prototype walkthroughs, not repeat use.',
+    evidence: 'Product walkthroughs used a neutral task: “Find an event you would actually attend next week and show us how you would register.” No verified X/N outcomes are reported here.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'inconclusive',
     limitations: 'A prototype is not a product, and first-use success would not show retention.',
     nextTest: 'Record unaided completion, relevance, availability match, redirect reached and friction.',
@@ -404,7 +403,7 @@ export const cards: EvidenceCard[] = [
     claim: 'An Imperial Careers contact welcomed a demonstration and offered to raise Orbit with the executive director.',
     evidence: 'A single stakeholder conversation. Possible internal champion identified.',
     sources: ['S3', 'S4'], label: 'reported', status: 'inconclusive',
-    limitations: 'Interest is not willingness to pay. No budget owner, price or commitment has been agreed.',
+    limitations: 'Interest is not willingness to pay. No budget owner, price or commitment has been agreed; A3 and A4 remain untested.',
     nextTest: 'Identify the budget owner and agree a pilot fee.',
   },
   {
@@ -424,46 +423,20 @@ export const cards: EvidenceCard[] = [
     nextTest: 'The paid pilot is the next rung.',
   },
 
-  /* ---- Coaching feedback ---- */
-  {
-    id: 'coach-1', category: 'coaching', chapter: 'coaching',
-    claim: 'The coaching session challenged our reasoning on five points.',
-    evidence: 'Whether the university and public-events products are the same business; how pilot success is defined; when to stop; where model assumptions came from; the path to a consumer product.',
-    sources: ['S6'], label: 'reported', status: 'supported',
-    limitations: 'Feedback from a single session.',
-    nextTest: 'Each challenge led to a decision; see the next cards.',
-  },
-  {
-    id: 'coach-2', category: 'coaching', chapter: 'coaching',
-    claim: 'The university and organiser products are different businesses.',
-    evidence: 'Different customers and different economics. The team narrowed to a university-first model with explicit gates.',
-    sources: ['S6'], label: 'reported', status: 'supported',
-    limitations: 'Coaching feedback, not market evidence.',
-    nextTest: 'Evaluate external events separately and only after Year 5.',
-  },
-  {
-    id: 'coach-3', category: 'coaching', chapter: 'coaching',
-    claim: 'We lacked success and stop criteria; we now define GO / ITERATE / STOP gates before the pilot.',
-    evidence: 'Success thresholds and stop conditions are set in advance of the pilot.',
-    sources: ['S6'], label: 'reported', status: 'supported',
-    limitations: 'Defined, not yet exercised.',
-    nextTest: 'Apply the gates to pilot data.',
-  },
-
   /* ---- Pilot protocol ---- */
   {
     id: 'pilot-1', category: 'pilot', chapter: 'experiment',
     claim: 'The next step is one paid, measurable 8–12 week university pilot, not more features.',
-    evidence: 'Thresholds are set in advance. It has not been run.',
-    sources: ['S3', 'S6'], label: 'proposed', status: 'untested',
+    evidence: 'Thresholds are set in advance. It has not been run. It tests the untested assumptions: payment (A3), feeds (A4), repeat use (A6), attendance (A7) and margin (A8).',
+    sources: ['S3'], label: 'proposed', status: 'untested',
     limitations: 'A proposal. No pilot has run, no institution has agreed, no fee is set.',
     nextTest: 'Agree scope, fee and data access with a budget owner.',
   },
   {
-    id: 'pilot-2', category: 'pilot', chapter: 'experiment',
+    id: 'pilot-2', category: 'pilot', chapter: 'gates',
     claim: 'Success is defined by repeat use, host-verified attendance and paid renewal.',
     evidence: 'Proposed thresholds: 20% weekly active users among activated users; +15% host-verified attendance per eligible student; at least 95% sampled listing accuracy; paid renewal.',
-    sources: ['S3', 'S6'], label: 'proposed', status: 'untested',
+    sources: ['S3'], label: 'proposed', status: 'untested',
     limitations: 'Thresholds are chosen by the team and are not benchmarked externally.',
     nextTest: 'Run the pilot and report against these thresholds, whichever way they fall.',
   },
@@ -476,29 +449,38 @@ export const cards: EvidenceCard[] = [
     nextTest: 'Obtain host attendance records for pilot events.',
   },
 
+  {
+    id: 'pilot-4', category: 'pilot', chapter: 'gates',
+    claim: 'GO / ITERATE / STOP are defined before the pilot starts.',
+    evidence: 'Pass the pre-set gates and we go; mixed results mean one iteration; failing on use, data or price means we stop. Real thresholds are agreed with each university once its baseline is known; the framework is fixed in advance.',
+    sources: ['S3'], label: 'proposed', status: 'untested',
+    limitations: 'Defined, not yet exercised. The numbers shown in the deck are illustrative.',
+    nextTest: 'Apply the gates to pilot data, whichever way they fall.',
+  },
+
   /* ---- Risks and stop conditions ---- */
   {
     id: 'risk-1', category: 'risks', chapter: 'verdict',
-    claim: 'Willingness to pay (A3) and repeat usage with renewal (A6) are untested; this is the material risk.',
+    claim: 'Willingness to pay (A3), repeat use (A6), attendance (A7) and margin (A8) are untested; this is the material risk.',
     evidence: 'No budget owner or price has been agreed; no pilot has run. First-use success would not prove weekly retention or increased attendance.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'untested',
     limitations: 'Applies to the whole venture; the verdict is conditional because of it.',
-    nextTest: 'The pilot is designed to test A3 and A6.',
+    nextTest: 'The pilot is designed to test A3 and A6–A8.',
   },
   {
     id: 'risk-2', category: 'risks', chapter: 'verdict',
-    claim: 'The assumption tracker does not show full validation: one supported, three inconclusive, two untested.',
-    evidence: 'A1 supported within the sample; A2, A4 and A5 inconclusive; A3 and A6 untested. Evidence has improved. Critical uncertainty remains.',
+    claim: 'The assumption tracker does not show full validation: one supported, two partial, five untested.',
+    evidence: 'A1 supported within the sample; A2 and A5 partial; A3 to A8 untested, with A3 and A4 partially tested with Imperial. Evidence has improved. Critical uncertainty remains.',
     sources: ['S3', 'S4'], label: 'unresolved', status: 'inconclusive',
     limitations: 'Statuses are the team’s assessment.',
     nextTest: 'Update each status only from verified results.',
   },
   {
-    id: 'risk-3', category: 'risks', chapter: 'experiment',
+    id: 'risk-3', category: 'risks', chapter: 'gates',
     claim: 'We would stop or iterate if pre-set pilot thresholds are not met.',
     evidence: 'GO / ITERATE / STOP gates are defined before the pilot. The thresholds that matter most are listed on the Pilot protocol cards and in the assumption tracker.',
-    sources: ['S6'], label: 'proposed', status: 'untested',
-    limitations: 'The full scorecard lives in the experiment chapter; it is not duplicated or extended here.',
+    sources: ['S3'], label: 'proposed', status: 'untested',
+    limitations: 'The full gate scorecard lives in the gates chapter; it is not duplicated or extended here.',
     nextTest: 'Apply the scorecard at the end of the pilot.',
   },
 
@@ -513,9 +495,9 @@ export const cards: EvidenceCard[] = [
   },
   {
     id: 'exp-2', category: 'expansion', chapter: 'scale',
-    claim: 'External-only city event discovery is a separate opportunity after Year 5, not the automatic next step.',
-    evidence: 'Potential inherited advantages: local event ecosystem familiarity, discovery infrastructure, potential organiser relationships, local user behaviour. New risks: users beyond the university segment, established consumer platforms, organiser partnerships, attributable paid registrations, commission economics, separate retention and acquisition costs.',
-    sources: ['S6'], label: 'proposed', status: 'untested',
+    claim: 'A university product and a public-events product are different businesses; external-only city event discovery is a separate opportunity after Year 5, not the automatic next step.',
+    evidence: 'They have different customers (universities versus users beyond the university segment and organisers) and different economics (institutional subscription versus commissions). Potential inherited advantages: local event ecosystem familiarity, discovery infrastructure, potential organiser relationships, local user behaviour. New risks: users beyond the university segment, established consumer platforms, organiser partnerships, attributable paid registrations, commission economics, separate retention and acquisition costs.',
+    sources: ['S3'], label: 'proposed', status: 'untested',
     limitations: 'External-event commissions are not included in the five-year university forecast. The university business can succeed while this one fails, or vice versa.',
     nextTest: 'Pursue only if its own evidence justifies it.',
   },
@@ -523,9 +505,9 @@ export const cards: EvidenceCard[] = [
   /* ---- References ---- */
   {
     id: 'ref-1', category: 'references', chapter: 'question',
-    claim: 'Every figure is traceable to seven supplied sources.',
-    evidence: 'S1–S7: course lectures (Weeks 2 and 3), the team’s reports, financial model V3, the coaching session feedback and HESA 2024/25 enrolment data. See the reference list below.',
-    sources: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'], label: 'observed', status: 'supported',
+    claim: 'Every figure is traceable to the supplied sources.',
+    evidence: 'The sources are listed in the reference list below: course lectures (Weeks 2 and 3), the team’s reports, financial model V3 and HESA 2024/25 enrolment data.',
+    sources: ['S1', 'S2', 'S3', 'S4', 'S5', 'S7'], label: 'observed', status: 'supported',
     limitations: 'No further academic citations are made beyond this list.',
     nextTest: 'Add independent sources as the pilot generates them.',
   },
@@ -685,7 +667,7 @@ export const anticipated: Anticipated[] = [
   },
   {
     q: 'What evidence supports willingness to pay?',
-    a: 'None yet beyond an interested Imperial Careers contact who welcomed a demonstration and offered to raise Orbit with the executive director. Interest is not willingness to pay: no budget owner, price or commitment has been agreed. Assumption A3 is untested commercially, and willingness to pay was the weakest screening criterion (2/5).',
+    a: 'None yet beyond an interested Imperial Careers contact who welcomed a demonstration and offered to raise Orbit with the executive director. Interest is not willingness to pay: no budget owner, price or commitment has been agreed. Assumption A3 is untested (partially tested with Imperial), and willingness to pay was the weakest screening criterion (2/5).',
     unknown: true,
     nextTest: 'Identify the budget owner and agree a pilot fee with paid-renewal criteria.',
     chapter: 'who-pays',
@@ -701,7 +683,7 @@ export const anticipated: Anticipated[] = [
     q: 'Why is the survey sample limited?',
     a: 'It was a small convenience sample recruited through team networks, 27 of 42 respondents were Imperial Business School MSc students, behaviour was self-reported, and the survey introduction named Orbit. We treat results as signals of a problem within the sample, not a population estimate.',
     nextTest: 'Structured discovery at two or three further institutions with an unbranded instrument.',
-    chapter: 'learning-before-building',
+    chapter: 'what-students-told-us',
   },
   {
     q: 'Why not monetise through students?',
@@ -713,24 +695,24 @@ export const anticipated: Anticipated[] = [
     q: 'How will you measure actual attendance?',
     a: 'Through host-verified attendance records, not clicks or redirects. The proposed threshold is +15% host-verified attendance per eligible student. Clicks, registrations and attendance are distinct measures. This depends on pilot hosts being willing to share attendance data, which is not yet agreed.',
     nextTest: 'Agree an attendance-verification method with pilot hosts before launch.',
-    chapter: 'experiment',
+    chapter: 'gates',
   },
   {
     q: 'What if engagement is strong but the university refuses to renew?',
-    a: 'Then the pilot has not succeeded. Paid renewal is a success criterion in its own right: students using Orbit would show product usage but not institutional willingness to pay, and the venture’s economics depend on renewal (A6). We would iterate or stop rather than expand.',
+    a: 'Then the pilot has not succeeded. Paid renewal is a success criterion in its own right: students using Orbit would show product usage but not institutional willingness to pay, and the venture’s economics depend on renewal (A3). We would iterate or stop rather than expand.',
     nextTest: 'Agree paid-renewal criteria with the budget owner before the pilot starts.',
-    chapter: 'experiment',
+    chapter: 'gates',
   },
   {
     q: 'Why should the external-events product wait?',
-    a: 'The coaching session showed the university and public-events products are different businesses with different customers and economics. External events bring new risks (users beyond the university segment, competing consumer platforms, organiser partnerships, attributable paid registrations, commission economics). It is excluded from the five-year forecast and pursued only if its own evidence justifies it.',
+    a: 'A university product and a public-events product are different businesses with different customers and economics. External events bring new risks (users beyond the university segment, competing consumer platforms, organiser partnerships, attributable paid registrations, commission economics). It is excluded from the five-year forecast and pursued only if its own evidence justifies it.',
     nextTest: 'Evaluate it as a separate opportunity after Year 5.',
     chapter: 'scale',
   },
   {
     q: 'What would make you abandon the venture?',
-    a: 'Stop conditions are defined before the pilot through GO / ITERATE / STOP gates. Missing the proposed thresholds recorded here would count against the venture: 20% weekly active users among activated users, +15% host-verified attendance per eligible student, at least 95% sampled listing accuracy, and paid renewal. The full scorecard is in the experiment chapter.',
+    a: 'Stop conditions are defined before the pilot through GO / ITERATE / STOP gates. Missing the proposed thresholds recorded here would count against the venture: 20% weekly active users among activated users, +15% host-verified attendance per eligible student, at least 95% sampled listing accuracy, and paid renewal. The full scorecard is in the gates chapter.',
     nextTest: 'Apply the pre-set scorecard at the end of the pilot.',
-    chapter: 'experiment',
+    chapter: 'gates',
   },
 ]

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { useState } from 'react'
 import FiveYearChart from '../components/model/FiveYearChart'
 import HeroChart from '../components/model/HeroChart'
+import Indicators from '../components/model/Indicators'
 import { LiquidityTiles, MinSuccessNotes, ThresholdBars } from '../components/model/MinimumSuccess'
 import ModelHeader from '../components/model/ModelHeader'
 import OrbitRings, { LayerCalc, LayerTabs, RingsSvg, SizingLimits, money, type LayerId } from '../components/model/OrbitRings'
@@ -22,7 +23,7 @@ const learning = {
   changed: 'We identified the purchasing and renewal evidence the model requires.',
 }
 
-const takeaway = 'The model establishes what must become true for Orbit to work. It does not establish that those assumptions will become true.'
+const takeaway = 'The model establishes what must become true for Orbit to work. It does not establish that those untested guesses will come true.'
 
 function ViewLabel({ n, title }: { n: string; title: string }) {
   return (
@@ -55,6 +56,7 @@ function ModelView({ compact }: { compact: boolean }) {
         <Stat big={`${d29.institutions}`} small="modelled paying universities in 2029, up from 3 in 2027" />
         <Stat big={gbp(d29.ebitda)} small="modelled 2029 EBITDA, the first positive year. 2027 and 2028 are modelled losses." />
         {!compact && <p className="text-[14.5px] leading-snug text-silver">{commentary[2029]}</p>}
+        <Indicators />
       </div>
     </div>
   )
@@ -151,12 +153,6 @@ function Takeaway({ size }: { size: 'present' | 'explore' }) {
 
 /* ---------- Present-mode hero views (one idea per step) ---------- */
 
-const strip = {
-  believed: 'A big market meant a viable business',
-  learned: 'It needs ~18 paying universities, and tight early cash',
-  changed: 'We named the purchase evidence it requires',
-}
-
 function Title({ text }: { text: string }) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -220,106 +216,60 @@ function RingsStep() {
 function ChartStep() {
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <p className="text-[clamp(1.6rem,3.2vw,3rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-snow">
-          <SplitHeadline text="EBITDA turns positive in *2029* (modelled)" />
-        </p>
-      </div>
-      <div className="mt-3 max-w-[1020px]">
-        <HeroChart />
-      </div>
-      <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[11px] uppercase tracking-wider text-silver">
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-3 rounded-sm bg-violet/60" /> Revenue</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-0.5 w-4 rounded bg-ev-modelled" /> EBITDA</span>
-        <EvidenceTag label="modelled" text="Modelled — not achieved" />
-        <span className="text-dim">S5</span>
-      </div>
-    </div>
-  )
-}
-
-function HeroStat({ value, format, suffix, label, delay }: { value: number; format: (n: number) => string; suffix?: ReactNode; label: string; delay: number }) {
-  return (
-    <Reveal delay={delay} className="rounded-3xl border border-line bg-navy/55 px-7 py-6">
-      <div className="text-[clamp(3rem,6.6vw,6.2rem)] leading-none">
-        <GlowNumber value={value} format={format} suffix={suffix} className="text-[1em]" />
-      </div>
-      <div className="mt-3 flex items-center gap-3 text-[clamp(1.05rem,1.5vw,1.4rem)] text-silver">
-        {label}
-      </div>
-    </Reveal>
-  )
-}
-
-function MinimumStep() {
-  return (
-    <div>
-      <Title text="What it needs. *And when cash bites.*" />
-      <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <HeroStat value={minimumSuccess.thresholdLow} format={(n) => `≈£${Math.round(n / 1000)}k`} suffix={<span className="text-[0.55em] text-silver">–{minimumSuccess.thresholdHigh / 1000}k</span>} label="revenue a year the 2029 model needs" delay={0.1} />
-        <HeroStat value={milestones.minCash} format={(n) => gbp(n)} label={`lowest year-end cash, ${milestones.minCashYear}`} delay={0.3} />
-      </div>
-      <Reveal delay={0.6}>
-        <p className="mt-6 max-w-4xl text-[clamp(1.2rem,2vw,1.9rem)] font-medium leading-snug text-snow">
-          A profitable Year 3 does not remove the risk of <span className="accent">running out of cash earlier.</span>
-        </p>
-      </Reveal>
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Expandable title={<span className="text-[14px]">Show the working</span>} className="min-w-[240px] max-w-3xl">
-          <div className="space-y-3">
-            <p className="text-[15px]">
-              2029 operating expenditure of <span className="num text-snow">{gbp(minimumSuccess.opex2029)}</span> plus a coverage allowance of about {Math.round(minimumSuccess.coverageAllowance * 100)}% gives a planning revenue threshold of{' '}
-              <span className="num text-snow">≈ {gbp(minimumSuccess.thresholdLow)}–{gbp(minimumSuccess.thresholdHigh)}</span> a year.
-            </p>
-            <ThresholdBars />
-            <MinSuccessNotes />
-            <LiquidityTiles />
+      <p className="text-[clamp(1.5rem,2.8vw,2.6rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-snow">
+        <SplitHeadline text="EBITDA turns positive in *2029* (modelled)" />
+      </p>
+      <div className="mt-3 grid items-center gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:gap-7">
+        <div>
+          <HeroChart h={360} />
+          <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[11px] uppercase tracking-wider text-silver">
+            <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-3 rounded-sm bg-violet/60" /> Revenue</span>
+            <span className="inline-flex items-center gap-1.5"><span className="h-0.5 w-4 rounded bg-ev-modelled" /> EBITDA</span>
+            <EvidenceTag label="modelled" text="Modelled — not achieved" />
+            <span className="text-dim">S5</span>
           </div>
-        </Expandable>
-        <EvidenceTag label="modelled" text="Modelled — not achieved" />
-        <SourceNote>S5</SourceNote>
+          <p className="mt-1 text-[12.5px] text-dim">{modelLabel}</p>
+        </div>
+        <Indicators />
       </div>
     </div>
   )
 }
 
-function SensitivityStep() {
-  return (
-    <div>
-      <Title text="How fragile is 2029? *Move the sliders.*" />
-      <div className="mt-3">
-        <SensitivityExplorer compact />
-      </div>
-    </div>
-  )
-}
-
-function TakeawayStep() {
+function MustBecomeTrueStep() {
+  const miss = 0.2
+  const after = sensitivity.revenueReduction(miss)
   const d29 = finYears.find((d) => d.year === 2029)!
-  const stats: { v: number; f: (n: number) => string; l: string }[] = [
-    { v: d29.institutions, f: (n) => `${Math.round(n)}`, l: 'paying universities needed by 2029' },
-    { v: milestones.minCash, f: (n) => gbp(n), l: 'lowest year-end cash, 2028' },
-    { v: (base2029.ebitda / base2029.revenue) * 100, f: (n) => `${n.toFixed(1)}%`, l: 'revenue miss erases 2029 profit' },
+  const tiles: { v: number; f: (n: number) => string; l: string }[] = [
+    { v: d29.institutions, f: (n) => `${Math.round(n)}`, l: 'paying universities by 2029' },
+    { v: milestones.arrTarget, f: (n) => `≈£${Math.round(n / 1000)}k`, l: 'recurring revenue (ARR) needed in 2029' },
   ]
   return (
-    <div className="space-y-7">
-      <p className="max-w-6xl text-[clamp(2.2rem,5vw,4.8rem)] font-semibold leading-[1.04] tracking-[-0.03em] text-snow">
+    <div className="space-y-6">
+      <p className="max-w-5xl text-[clamp(1.9rem,4vw,3.6rem)] font-semibold leading-[1.04] tracking-[-0.03em] text-snow">
         <SplitHeadline text="The model shows what *must become true* — not that it will." />
       </p>
-      <div className="grid max-w-5xl gap-6 sm:grid-cols-3">
-        {stats.map((st, i) => (
-          <Reveal key={st.l} delay={0.4 + i * 0.15}>
-            <div className="text-[clamp(2.2rem,4vw,3.6rem)] leading-none">
+      <div className="grid gap-5 sm:grid-cols-3">
+        {tiles.map((st, i) => (
+          <Reveal key={st.l} delay={0.4 + i * 0.15} className="rounded-2xl border border-line bg-navy/55 px-6 py-5">
+            <div className="text-[clamp(2.6rem,4.6vw,4.4rem)] leading-none">
               <GlowNumber value={st.v} format={st.f} className="text-[1em]" />
             </div>
-            <div className="mt-1.5 text-[15px] leading-snug text-silver">{st.l}</div>
+            <div className="mt-2 text-[16px] leading-snug text-silver">{st.l}</div>
           </Reveal>
         ))}
+        <Reveal delay={0.7} className="rounded-2xl border border-st-contradicted/40 bg-st-contradicted/[0.07] px-6 py-5">
+          <div className="num whitespace-nowrap text-[clamp(1.4rem,2.2vw,2.4rem)] font-semibold leading-none text-snow">
+            {gbp(base2029.ebitda, { compact: true, sign: true })} <span className="text-silver">→</span> <span className="text-red">{gbp(after, { compact: true })}</span>
+          </div>
+          <div className="mt-2 text-[16px] leading-snug text-silver">2029 EBITDA after a {miss * 100}% revenue miss: the profit is erased</div>
+        </Reveal>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <EvidenceTag label="modelled" text="Modelled — not achieved" />
+        <SourceNote>S5 · one-variable sensitivity, costs held constant</SourceNote>
       </div>
-      <LearningStrip {...strip} />
+      <LearningStrip believed="A big market meant a viable business." learned="It needs ~18 paying universities." changed="We named the purchase evidence it requires." />
     </div>
   )
 }
@@ -329,7 +279,7 @@ export default function Ch10Viability({ mode, step, setStep }: ChapterProps) {
   void setStep
 
   if (present) {
-    const views: ReactNode[] = [<RingsStep key="0" />, <ChartStep key="1" />, <MinimumStep key="2" />, <SensitivityStep key="3" />, <TakeawayStep key="4" />]
+    const views: ReactNode[] = [<RingsStep key="0" />, <ChartStep key="1" />, <MustBecomeTrueStep key="2" />]
     return (
       <Stage mode={mode} className="py-[58px]! sm:py-[60px]!">
         <ModelHeader num={meta.num} kicker={meta.title} title={meta.headline.replace('a real business?', '*a real business?*')} stage={meta.stage} compact />

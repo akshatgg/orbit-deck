@@ -8,7 +8,6 @@ import {
   Kicker,
   Accent,
   LearningCard,
-  LearningStrip,
   Reveal,
   SourceNote,
   Stage,
@@ -17,7 +16,7 @@ import {
   ease,
 } from '../components/ui'
 import { chapters } from '../data/chapters'
-import { caveatShort, drucker, originCaveat, originLead, originLearning, originNarrative, originNodes, originShort, originStrip } from '../data/origin'
+import { bridgeFrom, bridgeTo, drucker, originCaveat, originLead, originLearning, originNarrative, originNodes, originShort } from '../data/origin'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'origin')!
@@ -168,7 +167,7 @@ const DruckerChips = () => (
 export default function Ch01Origin({ mode, step }: ChapterProps) {
   const present = mode === 'present'
   const s = present ? step : meta.steps - 1
-  const visible = Math.max(0, Math.min(3, s)) // observation at step 1, problem 2, opportunity 3
+  const visible = s === 0 ? 2 : 3 // step 0: observation + problem hypothesis; step 1: + the idea
 
   if (!present) {
     return (
@@ -205,7 +204,7 @@ export default function Ch01Origin({ mode, step }: ChapterProps) {
 
   return (
     <Stage mode={mode}>
-      <ChapterHeader num={meta.num} kicker={meta.title} title="It started with *a problem we experienced ourselves.*" />
+      <ChapterHeader num={meta.num} kicker={meta.title} title="It started with *a problem we experienced.*" />
       <div className="mt-3">
         <StageLabel stage={meta.stage} />
       </div>
@@ -227,17 +226,24 @@ export default function Ch01Origin({ mode, step }: ChapterProps) {
         <GlowFlow visible={visible} />
       </div>
       <AnimatePresence initial={false}>
-        {s >= 3 && (
-          <motion.div key="below" className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease }}>
+        {s >= 1 && (
+          <motion.div key="below" className="mt-7 flex flex-col items-center gap-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 }}>
             <DruckerChips />
-            <p className="border-l-2 border-amber pl-4 text-left text-[clamp(1rem,1.3vw,1.25rem)] leading-snug text-snow">{caveatShort}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {s >= 4 && (
-          <motion.div key="lc" className="mt-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <LearningStrip {...originStrip} className="justify-center" />
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <p className="rounded-xl border-l-2 border-amber bg-amber/5 px-4 py-2.5 text-[clamp(1.15rem,1.7vw,1.6rem)] font-medium leading-snug text-snow">{bridgeFrom}</p>
+              <motion.span aria-hidden className="text-violet-soft" initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.8 }}>
+                <ArrowRight size={34} />
+              </motion.span>
+              <motion.p
+                className="rounded-full border border-violet/50 bg-violet/15 px-6 py-2.5 text-[clamp(1.2rem,1.8vw,1.7rem)] font-semibold text-snow"
+                style={{ boxShadow: '0 0 40px -8px rgb(139 92 246 / 0.8)' }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease, delay: 0.9 }}
+              >
+                {bridgeTo}
+              </motion.p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

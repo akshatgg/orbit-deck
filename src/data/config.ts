@@ -10,8 +10,8 @@ export const pitchConfig = {
   school: 'Imperial College Business School',
   teamName: 'Team 2S',
 
-  /** Default presentation length in minutes (editable live in the Rehearsal view). */
-  targetDurationMin: 10,
+  /** Planned SPEAKING length in minutes (13-minute slot: 12 min 15 s speaking + ~45 s buffer for the opening show of hands, handovers and tech). Editable live in the Rehearsal view. */
+  targetDurationMin: 12.25,
 
   /** Existing real prototype. null hides every link to it. */
   prototypeUrl: 'https://orbit.akshatgg.in/' as string | null,

@@ -19,20 +19,21 @@ export const presenterIds = Object.keys(team) as PresenterId[]
  * Rehearsal view; overrides are stored per browser (localStorage) — see useSpeakers().
  */
 export const defaultSpeakers: Record<string, PresenterId> = {
-  question: 'swayam',
-  origin: 'swayam',
-  screening: 'sabrina',
-  'learning-before-building': 'lyn',
-  'what-students-told-us': 'lyn',
-  'assumptions-changed': 'rong',
-  jtbd: 'ilham',
-  product: 'swayam',
-  'who-pays': 'sabrina',
-  'lean-canvas': 'sabrina',
-  viability: 'juan',
-  'market-engagement': 'sabrina',
-  coaching: 'rong',
-  experiment: 'rong',
-  scale: 'ilham',
-  verdict: 'swayam',
+  // ≈ 2 min each for a 12 min 15 s talk (see chapters.ts durationSec)
+  question: 'swayam', // 55
+  origin: 'swayam', // 25
+  screening: 'swayam', // 40  → 120 s
+  'what-students-told-us': 'lyn', // 70
+  'product-decisions': 'lyn', // 55  → 125 s
+  jtbd: 'ilham', // 30
+  product: 'ilham', // 60
+  'who-pays': 'ilham', // 30  → 120 s
+  'lean-canvas': 'juan', // 35
+  viability: 'juan', // 85  → 120 s
+  'market-engagement': 'sabrina', // 40
+  walkthroughs: 'sabrina', // 40
+  experiment: 'sabrina', // 45  → 125 s
+  gates: 'rong', // 35
+  scale: 'rong', // 20
+  verdict: 'rong', // 70  → 125 s
 }

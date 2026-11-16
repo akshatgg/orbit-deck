@@ -20,8 +20,8 @@ export type Status = 'supported' | 'inconclusive' | 'untested' | 'contradicted'
 
 export const statusMeta: Record<Status, { label: string; color: string; meaning: string }> = {
   supported: { label: 'Supported', color: 'var(--color-st-supported)', meaning: 'Evidence points in this direction.' },
-  inconclusive: { label: 'Inconclusive', color: 'var(--color-st-inconclusive)', meaning: 'Some signals exist but the claim is not established.' },
-  untested: { label: 'Untested', color: 'var(--color-st-untested)', meaning: 'Evidence is not yet sufficient.' },
+  inconclusive: { label: 'Partial', color: 'var(--color-st-inconclusive)', meaning: 'Some signals exist but the claim is not established.' },
+  untested: { label: 'Untested', color: 'var(--color-st-untested)', meaning: 'Evidence is not yet sufficient: an untested guess.' },
   contradicted: { label: 'Contradicted', color: 'var(--color-st-contradicted)', meaning: 'Available evidence challenges the stated hypothesis.' },
 }
 

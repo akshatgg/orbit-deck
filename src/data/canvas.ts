@@ -1,5 +1,5 @@
 import { assumptions } from './assumptions'
-import type { Status } from './evidence'
+import { statusMeta, type Status } from './evidence'
 import { pricingTiers } from './market'
 import { base2029 } from './financials'
 
@@ -164,6 +164,12 @@ export const canvasBoxes: CanvasBox[] = [
   },
 ]
 
+/** Label used on this chapter: an untested box reads as an untested guess; 'inconclusive' renders as Partial. */
+export const statusLabel = (s: Status) => (s === 'untested' ? 'Untested guess' : statusMeta[s].label)
+
+/** Count-aware label for tallies: '1 untested guess', '3 untested guesses'. */
+export const tallyLabel = (s: Status, n: number) => (s === 'untested' ? (n === 1 ? 'untested guess' : 'untested guesses') : statusMeta[s].label.toLowerCase())
+
 /** Compute the tally from the data, never hard-coded. */
 export const canvasTally = (['supported', 'inconclusive', 'untested', 'contradicted'] as Status[]).map((s) => ({
   status: s,
@@ -188,12 +194,12 @@ export const riskiest = {
   short: 'A university will *pay and renew* for measurable results.',
   statement: 'A university will pay and renew for measurable improvements in student event discovery and participation.',
   linked: ['revenue', 'metrics'] as CanvasId[],
-  principle: 'The Week 3 learning principle is not to complete the canvas once. It is to move assumptions towards evidence.',
+  principle: 'The Week 3 learning principle is not to complete the canvas once. It is to move untested guesses towards evidence.',
 }
 
 export const canvasLearning = {
   believed: 'The canvas described our business.',
   investigated: 'The evidence behind each of the nine boxes.',
-  learned: 'Most boxes are inconclusive or untested. Only the problem has support, and only within our sample.',
-  changed: 'We prioritised testing the riskiest assumption over completing the plan.',
+  learned: 'Most boxes are partial or untested guesses. Only the problem has support, and only within our sample.',
+  changed: 'We prioritised testing the riskiest untested guess over completing the plan.',
 }

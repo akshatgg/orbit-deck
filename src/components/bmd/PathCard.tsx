@@ -43,6 +43,7 @@ export function PathCard({ m, state, detail, verdictOn }: { m: RevenueModel; sta
             className="overflow-hidden"
           >
             <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-sm font-medium ${lead ? 'border-violet/60 bg-violet/20 text-violet-soft' : 'border-dashed border-silver/50 text-silver'}`}>{m.verdict}</div>
+            {lead && <span className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber/50 bg-amber/10 px-3 py-1 text-sm font-medium text-amber"><span className="h-1.5 w-1.5 rounded-full bg-amber" /> Untested guess</span>}
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Target } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { CanvasDrawer, CanvasGrid, DetailFields, type CanvasView } from '../components/model/CanvasGrid'
+import { CanvasDrawer, CanvasGrid, DetailFields, GuessPill, type CanvasView } from '../components/model/CanvasGrid'
 import { FlipCanvas, StatusNumber } from '../components/model/FlipCanvas'
 import ModelHeader from '../components/model/ModelHeader'
-import { Button, ChapterHeader, CountUp, EvidenceTag, Expandable, LearningCard, SourceNote, SplitHeadline, Stage, StatusPill, ease } from '../components/ui'
-import { canvasBoxes, canvasLearning, canvasTally, riskiest, type CanvasId } from '../data/canvas'
+import { Button, ChapterHeader, CountUp, EvidenceTag, Expandable, LearningCard, SourceNote, SplitHeadline, Stage, ease } from '../components/ui'
+import { canvasBoxes, canvasLearning, canvasTally, riskiest, tallyLabel, type CanvasId } from '../data/canvas'
 import { chapters } from '../data/chapters'
 import { statusMeta } from '../data/evidence'
 import type { ChapterProps } from '../shell/types'
@@ -47,13 +47,13 @@ function Tally({ current }: { current: boolean }) {
             {canvasTally.map((t) => (
               <span key={t.status} className="inline-flex items-center gap-1.5 text-[15px] text-silver">
                 <span className="h-2 w-2 rounded-full" style={{ background: statusMeta[t.status].color }} />
-                <span className="num text-lg font-semibold text-snow">{t.count}</span> {statusMeta[t.status].label.toLowerCase()}
+                <span className="num text-lg font-semibold text-snow">{t.count}</span> {tallyLabel(t.status, t.count)}
               </span>
             ))}
           </motion.div>
         ) : (
           <motion.span key="h" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease }} className="text-[15px] text-silver">
-            <span className="num text-lg font-semibold text-snow">{canvasBoxes.length}</span> working hypotheses, none yet tested against evidence
+            <span className="num text-lg font-semibold text-snow">{canvasBoxes.length}</span> initial guesses, none yet tested against evidence
           </motion.span>
         )}
       </AnimatePresence>
@@ -65,7 +65,7 @@ function RiskCallout({ compact }: { compact: boolean }) {
   return (
     <div className={`rounded-xl border border-violet/50 bg-violet/10 ${compact ? 'p-3' : 'p-5'}`}>
       <div className="flex items-center gap-2">
-        <EvidenceTag label="proposed" text="Riskiest assumption" />
+        <EvidenceTag label="proposed" text="Riskiest untested guess" />
         <span className="font-mono text-[10.5px] uppercase tracking-wider text-dim">Revenue streams + Key metrics</span>
       </div>
       <p className={`mt-1.5 font-medium leading-snug text-snow ${compact ? 'text-[17px]' : 'text-xl'}`}>{riskiest.statement}</p>
@@ -75,70 +75,57 @@ function RiskCallout({ compact }: { compact: boolean }) {
 }
 
 
-/** Present mode: one hero row (number / tally / statement) over the flipping canvas. */
+/** Present mode: one hero row over the flipping canvas. Step 0 = initial guesses, step 1 = evidence state + riskiest untested guess. */
 function PresentCanvas({ step, onOpen }: { step: number; onOpen: (id: CanvasId) => void }) {
   return (
     <>
-      <div className="mt-3 flex min-h-[84px] items-center" aria-live="polite">
+      <div className="mt-3 flex min-h-[112px] items-center" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
-          {step === 0 && (
+          {step === 0 ? (
             <motion.div key="s0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }} className="flex items-baseline gap-4">
               <span className="glow-num text-[clamp(3rem,5.2vw,4.8rem)] font-semibold leading-none text-snow">
                 <CountUp value={canvasBoxes.length} duration={0.8} />
               </span>
-              <span className="text-[clamp(1.1rem,1.6vw,1.6rem)] text-silver">hypotheses, none tested yet</span>
+              <span className="text-[clamp(1.1rem,1.6vw,1.6rem)] text-silver">initial guesses, none tested yet</span>
             </motion.div>
-          )}
-          {step === 1 && (
-            <motion.div key="s1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4, ease }} className="flex flex-wrap items-center gap-x-9 gap-y-2">
-              {canvasTally.map((t) => (
-                <StatusNumber key={t.status} count={t.count} status={t.status} />
-              ))}
-            </motion.div>
-          )}
-          {step >= 2 && (
-            <motion.div key="s2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.5, ease }} className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              <EvidenceTag label="proposed" text="Riskiest assumption" />
-              <p className="text-[clamp(1.5rem,2.9vw,2.7rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-snow">
-                <SplitHeadline text={riskiest.short} />
-              </p>
+          ) : (
+            <motion.div key="s1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.5, ease }} className="flex flex-col gap-2.5">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-1">
+                {canvasTally.map((t) => (
+                  <StatusNumber key={t.status} count={t.count} status={t.status} small />
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <EvidenceTag label="proposed" text="Riskiest untested guess" />
+                <p className="text-[clamp(1.3rem,2.4vw,2.2rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-snow">
+                  <SplitHeadline text={riskiest.short} />
+                </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
       <div className="mt-3">
-        <FlipCanvas current={step >= 1} risk={step >= 2} onOpen={onOpen} />
+        <FlipCanvas current={step >= 1} risk={step >= 1} onOpen={onOpen} rowHeight={108} />
       </div>
-      <div className="mt-2.5 min-h-[46px]">
-        <AnimatePresence mode="wait" initial={false}>
-          {step >= 2 ? (
-            <motion.div key="full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <Expandable title={<span className="text-[14px]">Full wording: revenue streams + key metrics</span>} className="max-w-3xl">
-                {riskiest.statement}
-              </Expandable>
-            </motion.div>
-          ) : (
-            <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="font-mono text-[11px] text-dim">
-              S2 · click a card for detail
-            </motion.p>
-          )}
-        </AnimatePresence>
+      <div className="mt-2.5 min-h-[38px]">
+        <p className="font-mono text-[11px] text-dim">S2 · click a box for detail</p>
       </div>
     </>
   )
 }
 
-export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
+export default function Ch09LeanCanvas({ mode, step }: ChapterProps) {
   const present = mode === 'present'
   const [exploreView, setExploreView] = useState<CanvasView>('current')
   const [exploreRisk, setExploreRisk] = useState(false)
   const [open, setOpen] = useState<CanvasId | null>(null)
   const close = useCallback(() => setOpen(null), [])
 
-  const view: CanvasView = present ? (step >= 1 ? 'current' : 'initial') : exploreView
-  const risk = present ? step >= 2 : exploreRisk
-  const setView = (v: CanvasView) => (present ? setStep(v === 'initial' ? 0 : 1) : setExploreView(v))
-  const toggleRisk = () => (present ? setStep(step >= 2 ? 1 : 2) : setExploreRisk((r) => !r))
+  const view: CanvasView = exploreView
+  const risk = exploreRisk
+  const setView = setExploreView
+  const toggleRisk = () => setExploreRisk((r) => !r)
 
   return (
     <Stage mode={mode} className={present ? 'py-[58px]! sm:py-[60px]!' : ''}>
@@ -164,7 +151,7 @@ export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
             </div>
             {view === 'current' && (
               <Button variant={risk ? 'primary' : 'outline'} size="sm" onClick={toggleRisk} aria-pressed={risk}>
-                <Target size={14} /> {risk ? 'Show all nine boxes' : 'Show our riskiest assumption'}
+                <Target size={14} /> {risk ? 'Show all nine boxes' : 'Show our riskiest untested guess'}
               </Button>
             )}
           </div>
@@ -183,7 +170,7 @@ export default function Ch09LeanCanvas({ mode, step, setStep }: ChapterProps) {
                   key={b.id}
                   title={
                     <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="num text-dim">{b.n}</span> {b.name} <StatusPill status={b.status} />
+                      <span className="num text-dim">{b.n}</span> {b.name} <GuessPill status={b.status} />
                     </span>
                   }
                 >

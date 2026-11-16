@@ -60,3 +60,8 @@ export const originStrip = {
   learned: 'We need evidence beyond ourselves',
   changed: 'Screen the opportunity first',
 }
+
+/** Present-mode bridge into screening (step 1 close). */
+export const bridgeFrom = 'A hypothesis, not a market.'
+export const bridgeTo = 'Screen it.'
+export const ideaShort = 'One discovery layer'

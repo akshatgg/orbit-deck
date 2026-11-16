@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Target } from 'lucide-react'
-import { canvasBoxes, canvasShort, riskiest, type CanvasBox, type CanvasId } from '../../data/canvas'
+import { canvasBoxes, canvasShort, riskiest, statusLabel, tallyLabel, type CanvasBox, type CanvasId } from '../../data/canvas'
 import { statusMeta } from '../../data/evidence'
 import { CountUp, ease } from '../ui'
 
@@ -31,7 +31,7 @@ function Card({ b, i, current, dim, hot, onOpen }: { b: CanvasBox; i: number; cu
       className={`relative min-h-0 ${place[b.id]}`}
       style={{ perspective: 1100, zIndex: hot ? 2 : 1 }}
       initial={false}
-      animate={{ opacity: dim ? 0.18 : 1, scale: hot ? 1.02 : 1 }}
+      animate={{ opacity: dim ? 0.4 : 1, scale: hot ? 1.02 : 1 }}
       transition={{ duration: 0.6, ease }}
     >
       <motion.button
@@ -40,7 +40,7 @@ function Card({ b, i, current, dim, hot, onOpen }: { b: CanvasBox; i: number; cu
           e.stopPropagation()
           onOpen(b.id)
         }}
-        aria-label={`${b.n}. ${b.name}: ${current ? `${statusMeta[b.status].label}. ${phrase.current}` : phrase.initial}. Open details.`}
+        aria-label={`${b.n}. ${b.name}: ${current ? `${statusLabel(b.status)}. ${phrase.current}` : phrase.initial}. Open details.`}
         className="relative block h-full w-full text-left transition-[filter] hover:brightness-125"
         style={{ transformStyle: 'preserve-3d' }}
         initial={false}
@@ -71,12 +71,12 @@ function Card({ b, i, current, dim, hot, onOpen }: { b: CanvasBox; i: number; cu
           <span aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: colour }} />
           <span className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.14em] text-silver">
             <span>{b.name}</span>
-            {hot && <Target size={14} className="text-violet-soft" aria-label="Riskiest assumption" />}
+            {hot && <Target size={14} className="text-violet-soft" aria-label="Riskiest untested guess" />}
           </span>
           <p className={`mt-2 font-medium leading-snug text-snow ${txt}`}>{phrase.current}</p>
           <span className="mt-auto flex items-center gap-1.5 pt-1 text-[13px] font-medium" style={{ color: colour }}>
             <span className="h-2 w-2 rounded-full" style={{ background: colour, boxShadow: `0 0 10px ${colour}` }} />
-            {statusMeta[b.status].label}
+            {statusLabel(b.status)}
           </span>
         </div>
       </motion.button>
@@ -98,16 +98,16 @@ export function FlipCanvas({ current, risk, onOpen, rowHeight = 116 }: { current
 }
 
 /** Big glowing status number for the tally. */
-export function StatusNumber({ count, status }: { count: number; status: keyof typeof statusMeta }) {
+export function StatusNumber({ count, status, small = false }: { count: number; status: keyof typeof statusMeta; small?: boolean }) {
   const colour = statusMeta[status].color
   return (
     <span className="inline-flex items-baseline gap-2.5">
       <span style={{ textShadow: `0 0 34px color-mix(in srgb, ${colour} 75%, transparent), 0 0 80px color-mix(in srgb, ${colour} 30%, transparent)` }}>
-        <CountUp value={count} duration={0.9} className="text-[clamp(2.6rem,4.6vw,4.2rem)] font-semibold leading-none tracking-tight text-snow" />
+        <CountUp value={count} duration={0.9} className={`${small ? 'text-[clamp(1.8rem,2.8vw,2.6rem)]' : 'text-[clamp(2.6rem,4.6vw,4.2rem)]'} font-semibold leading-none tracking-tight text-snow`} />
       </span>
       <span className="inline-flex items-center gap-1.5 text-[17px] font-medium" style={{ color: colour }}>
         <span className="h-2.5 w-2.5 rounded-full" style={{ background: colour, boxShadow: `0 0 14px ${colour}` }} />
-        {statusMeta[status].label.toLowerCase()}
+        {tallyLabel(status, count)}
       </span>
     </span>
   )

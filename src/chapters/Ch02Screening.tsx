@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { ScreeningRadar } from '../components/ideation/ScreeningRadar'
-import { Accent, ChapterHeader, CountUp, Expandable, GlowNumber, Kicker, LearningCard, SourceNote, Stage, StageLabel, TiltCard, ease } from '../components/ui'
+import { ChapterHeader, Logo, CountUp, Expandable, GlowNumber, Kicker, LearningCard, SourceNote, Stage, StageLabel, TiltCard, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
-import { SCREEN_WEIGHT, closingLine, shortRationale, criteria, lowest, screeningLearning, screeningTotal, verdict, verdictNote, weighted } from '../data/screening'
+import { SCREEN_WEIGHT, closingLine, criteria, lowest, nextShort, screeningLearning, screeningTotal, selectedShort, shortRationale, verdict, verdictNote, weakBadge, weighted } from '../data/screening'
 import type { ChapterProps } from '../shell/types'
 
 const meta = chapters.find((c) => c.slug === 'screening')!
@@ -151,57 +152,36 @@ function WeakLink() {
   )
 }
 
-/** Present-mode compact list: name, bars, score, and a ONE-line rationale on the active row. */
-function PresentList({ revealed, activeId, onHover, onPick, hotId }: { revealed: number; activeId: string | null; onHover: (id: string | null) => void; onPick: (id: string) => void; hotId: string | null }) {
+/** Present step 0: the whole matrix at once. Rows stagger in together; payment is flagged as the weak point. */
+function PresentMatrix({ ready }: { ready: boolean }) {
   return (
-    <ul className="space-y-1.5">
+    <ul className="space-y-2">
       {criteria.map((c, i) => {
-        const shown = i < revealed
-        const active = activeId === c.id
-        const hot = hotId === c.id
-        const col = hot ? 'text-amber' : shown ? 'text-snow' : 'text-dim'
+        const hot = c.id === lowest.id
+        const col = hot ? 'text-amber' : 'text-snow'
         return (
-          <li key={c.id}>
-            <button
-              type="button"
-              disabled={!shown}
-              onClick={(e) => {
-                e.stopPropagation()
-                onPick(c.id)
-              }}
-              onMouseEnter={() => shown && onHover(c.id)}
-              onMouseLeave={() => onHover(null)}
-              onFocus={() => shown && onHover(c.id)}
-              onBlur={() => onHover(null)}
-              aria-label={`${c.name}${shown ? `: ${c.score} out of 5` : ''}`}
-              className={`block w-full rounded-xl border px-4 py-2 text-left transition-all duration-500 disabled:cursor-default ${
-                hot ? 'border-amber/60 bg-amber/10 shadow-[0_0_40px_-10px_var(--color-amber)]' : active ? 'border-cyan/50 bg-white/[0.06]' : 'border-line bg-navy/50'
-              }`}
-            >
-              <span className="flex items-center gap-3">
-                <span className={`flex-1 text-[19px] font-semibold leading-tight transition-colors duration-500 ${col === 'text-dim' ? 'text-silver' : col}`}>
-                  <span className="num mr-2 text-dim">{c.q}</span>
-                  {c.name}
-                </span>
-                <ScoreBar score={c.score} show={shown} hot={hot} />
-                <span className={`num w-10 text-right text-xl font-semibold ${col}`}>{shown ? `${c.score}/5` : '–'}</span>
+          <motion.li
+            key={c.id}
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: ready ? 1 : 0, x: ready ? 0 : 24 }}
+            transition={{ duration: 0.55, ease, delay: ready ? 0.1 + i * 0.12 : 0 }}
+            className={`rounded-xl border px-4 py-2.5 ${hot ? 'border-amber/60 bg-amber/10 shadow-[0_0_40px_-10px_var(--color-amber)]' : 'border-line bg-navy/50'}`}
+          >
+            <div className="flex items-center gap-3">
+              <span className={`flex-1 text-[clamp(1.1rem,1.5vw,1.4rem)] font-semibold leading-tight ${col}`}>
+                <span className="num mr-2 text-dim">{c.q}</span>
+                {c.name}
               </span>
-              <AnimatePresence initial={false}>
-                {active && shown && (
-                  <motion.span
-                    key="r"
-                    className="block overflow-hidden text-[15px] leading-snug text-silver"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease }}
-                  >
-                    <span className="block pt-1">{shortRationale[c.id]}</span>
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
-          </li>
+              <ScoreBar score={c.score} show={ready} hot={hot} />
+              <span className={`num w-12 text-right text-[clamp(1.3rem,1.8vw,1.7rem)] font-semibold ${col}`}>{c.score}/5</span>
+            </div>
+            {hot && (
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-[15px] leading-snug text-silver">
+                <span className="rounded-full border border-amber/50 px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-amber">{weakBadge}</span>
+                {shortRationale[c.id]}
+              </div>
+            )}
+          </motion.li>
         )
       })}
     </ul>
@@ -210,36 +190,51 @@ function PresentList({ revealed, activeId, onHover, onPick, hotId }: { revealed:
 
 function PresentVerdict() {
   return (
-    <TiltCard glow className="px-6 py-4 text-center" max={4}>
-      <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-silver">Screening outcome</div>
-      <div className="mt-2 text-[clamp(1.6rem,2.6vw,2.5rem)] font-semibold leading-none tracking-tight text-snow" style={{ textShadow: '0 0 40px rgb(56 189 248 / 0.55), 0 0 90px rgb(139 92 246 / 0.4)' }}>
-        {verdict}
-      </div>
-      <div className="mt-2 flex items-end justify-center gap-2">
-        <GlowNumber value={screeningTotal} format={(n) => n.toFixed(2)} className="text-[clamp(3rem,5vw,4.5rem)] leading-none" />
+    <TiltCard glow className="px-6 py-3 text-center" max={4}>
+      <div className="flex items-end justify-center gap-2">
+        <GlowNumber value={screeningTotal} format={(n) => n.toFixed(1)} className="text-[clamp(3.2rem,5.4vw,5rem)] leading-none" />
         <span className="pb-2 text-xl text-silver">/ 5</span>
       </div>
-      <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Screening judgement — not validated</div>
+      <div className="mt-2 text-[clamp(1.3rem,2.4vw,2.1rem)] font-semibold leading-none tracking-tight text-snow" style={{ textShadow: '0 0 40px rgb(56 189 248 / 0.55), 0 0 90px rgb(139 92 246 / 0.4)' }}>
+        {verdict}
+      </div>
+      <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Screening judgement, not validated</div>
     </TiltCard>
+  )
+}
+
+/** Selection hand-off: Orbit selected → Discovery. */
+function Selected() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-4">
+      <span className="flex items-center gap-3 rounded-full border border-violet/50 bg-violet/15 py-1.5 pl-3 pr-5 text-[clamp(1.1rem,1.6vw,1.5rem)] font-semibold text-snow" style={{ boxShadow: '0 0 40px -8px rgb(139 92 246 / 0.8)' }}>
+        <Logo size={26} wordmark={false} />
+        {selectedShort}
+      </span>
+      <ArrowRight size={30} className="text-violet-soft" aria-hidden />
+      <span className="rounded-full border border-line bg-navy/70 px-5 py-2 text-[clamp(1.1rem,1.6vw,1.5rem)] text-silver">{nextShort}</span>
+    </div>
   )
 }
 
 export default function Ch02Screening({ mode, step }: ChapterProps) {
   const present = mode === 'present'
-  const s = present ? step : meta.steps - 1
-  const revealed = Math.min(5, Math.max(0, s))
-  const final = s >= 6
+  const final = present ? step >= 1 : true
+  // present: scores animate in together after mount (radar + matrix stagger), then stay put
+  const [ready, setReady] = useState(!present)
+  useEffect(() => {
+    if (!present) return
+    const t = window.setTimeout(() => setReady(true), 150)
+    return () => window.clearTimeout(t)
+  }, [present])
+  const revealed = ready ? 5 : 0
 
-  // hover is transient; pin is set by click and tied to the step it was made on (so stepping resets it)
+  // explore only: hover / pin a criterion to read its rationale
   const [hover, setHover] = useState<string | null>(null)
-  const [pin, setPin] = useState<{ step: number; id: string } | null>(null)
-  const pinned = pin && pin.step === s ? pin.id : null
-  const picked = hover ?? pinned
-  const stepId = s >= 1 && s <= 5 ? criteria[s - 1].id : null
-  const shownIds = criteria.slice(0, revealed).map((c) => c.id)
-  const activeId = picked && shownIds.includes(picked) ? picked : stepId
-  const hotId = final ? lowest.id : null
-  const pick = (id: string) => setPin((p) => (p && p.step === s && p.id === id ? null : { step: s, id }))
+  const [pin, setPin] = useState<string | null>(null)
+  const activeId = hover ?? pin
+  const hotId = lowest.id
+  const pick = (id: string) => setPin((p) => (p === id ? null : id))
 
   const left = (
     <div className="flex flex-col items-center">
@@ -281,27 +276,27 @@ export default function Ch02Screening({ mode, step }: ChapterProps) {
           <StageLabel stage={meta.stage} />
           <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Week 2 NVC (S1) · 5 questions · 20% each</span>
         </div>
-        <div className="mt-4 grid items-center gap-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:gap-10">
-          <div className="flex justify-center">
-            <ScreeningRadar revealed={revealed} activeId={activeId} onHover={setHover} onPick={pick} highlightId={hotId} className="max-w-[600px]" />
-          </div>
-          <div className="space-y-3">
-            <AnimatePresence>
+        <div className="mt-4 grid items-center gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
+          <motion.div layout="position" transition={{ duration: 0.6, ease }} className="flex flex-col items-center gap-3">
+            <ScreeningRadar revealed={revealed} activeId={null} onHover={() => {}} onPick={() => {}} highlightId={hotId} interactive={false} className="max-w-[min(500px,50vh)]" />
+            <AnimatePresence initial={false}>
               {final && (
-                <motion.div key="verdict" initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }}>
+                <motion.div key="verdict" className="w-full max-w-[500px]" initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }}>
                   <PresentVerdict />
                 </motion.div>
               )}
             </AnimatePresence>
-            <PresentList revealed={revealed} activeId={final ? null : activeId} onHover={setHover} onPick={pick} hotId={hotId} />
-            <AnimatePresence>
+          </motion.div>
+          <motion.div layout="position" transition={{ duration: 0.6, ease }} className="space-y-4">
+            <PresentMatrix ready={ready} />
+            <AnimatePresence initial={false}>
               {final && (
-                <motion.p key="close" className="pt-1 text-center text-[clamp(1.1rem,1.6vw,1.6rem)] leading-snug" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }}>
-                  <Accent>{closingLine}</Accent>
-                </motion.p>
+                <motion.div key="sel" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }}>
+                  <Selected />
+                </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
       </Stage>
     )

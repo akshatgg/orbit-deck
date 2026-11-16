@@ -1,25 +1,18 @@
 /**
- * Present-mode (pitch) phrases for chapters 11–13. Every long original lives untouched in
- * engagement.ts / coaching.ts / pilot.ts and still appears in Explore mode.
+ * Present-mode (pitch) phrases for the Validation chapters (11–13). Every long original lives
+ * untouched in engagement.ts / walkthroughs.ts / pilot.ts and still appears in Explore mode.
  */
 
-/* ---------- Ch11 ---------- */
+/* ---------- Market engagement ---------- */
 
 export const engagementShort = {
-  step0: 'One Imperial contact welcomed the demonstration.',
-  step0Tag: 'Not a commitment',
-  step1: 'Same problem, elsewhere.',
-  step1Line: 'Student accounts, not customers, partners or demand.',
-  step2: 'Two things happened. Everything after is still open.',
-  step3: 'Three rungs lit. Three still dark.',
-}
-
-export const journeyShortLabels: Record<string, string> = {
-  contact: 'Contact',
-  demo: 'Demo',
-  champion: 'Champion?',
-  exec: 'Executive talk?',
-  procurement: 'Procurement',
+  imperialTitle: 'Imperial Careers',
+  imperialLine: 'One contact welcomed a demonstration.',
+  imperialTag: 'Not a commitment',
+  othersTitle: 'Other London students',
+  othersLine: 'Individual accounts of the same frustration.',
+  othersTag: 'Not customers or partners',
+  ladderNote: 'One contact is interest, not payment. No pilot, contract or renewal exists.',
 }
 
 export const engagementStrip = {
@@ -28,48 +21,46 @@ export const engagementStrip = {
   changed: 'Model rebuilt around budget owner',
 }
 
-/* ---------- Ch12 ---------- */
+/* ---------- Walkthroughs ---------- */
 
-export const coachingShort: { id: string; tag: string; challenge: string; decision: string }[] = [
-  { id: 'same-business', tag: 'Same business?', challenge: 'Different customers, different economics.', decision: 'University SaaS is the core; organiser model waits.' },
-  { id: 'pilot-success', tag: 'Pilot success?', challenge: 'Success was too vague to ever fail.', decision: 'Define cohort, engagement, accuracy, attendance, renewal criteria.' },
-  { id: 'stop', tag: 'When to stop?', challenge: 'No failure condition existed.', decision: 'Write GO / ITERATE / STOP rules before testing.' },
-  { id: 'financials', tag: 'Assumptions?', challenge: 'Forecasts need sources others can challenge.', decision: 'Expose the arithmetic, discounting and sensitivities.' },
-  { id: 'consumer', tag: 'Path to consumer?', challenge: 'No proven path from universities to consumers.', decision: 'Universities first; external discovery stays a hypothesis.' },
-]
-
-export const coachingPresent = {
-  intro: 'Five questions. Each one changed a decision.',
-  endLead: 'It did not say we would succeed.',
-  endAccent: 'It clarified what to prove.',
-  source: 'S6 · critique, not validation.',
+export const walkthroughShort = {
+  taskLabel: 'The one neutral task',
+  measuresLabel: 'We watched for',
+  streamsLabel: 'Four kinds of evidence',
+  product: 'Product evidence',
+  honestHero: 'Partial support.',
+  honestAccent: 'Not proof they will return.',
+  pilotNeeded: 'Needs the pilot',
 }
 
-export const coachingStrip = {
-  believed: 'A broad event product was coherent',
-  learned: 'No success definition, no stop rule',
-  changed: 'University-first SaaS with GO / ITERATE / STOP gates',
+/** What kind of evidence each stream is (shown on the strip). */
+export const streamKind: Record<string, string> = {
+  survey: 'Problem',
+  interviews: 'Problem',
+  walkthroughs: 'Product',
+  institution: 'Buyer',
 }
 
-/* ---------- Ch13 ---------- */
-
-export const pilotTrackLabels = ['Budget owner', 'Fee & renewal', 'Data access', 'Baseline', 'Cohort', 'Observe', 'Evaluate', 'Decide']
+/* ---------- Pilot ---------- */
 
 export const pilotPresent = {
-  banner: 'Proposed — not run',
-  step0Lead: 'One paid, controlled',
-  step0Accent: '8–12-week pilot',
-  step0Tail: 'at Imperial.',
-  step1Lead: 'What would',
-  step1Accent: 'real engagement',
-  step1Tail: 'look like?',
-  step1Note: 'Illustrative cohort, not a university-wide requirement.',
-  step2Lead: 'Six gates, set',
-  step2Accent: 'before any result.',
-  step2Chip: 'A click is not attendance.',
-  endLead: 'The next milestone is not more features.',
-  endAccent: 'It is stronger evidence.',
-  source: 'Proposed design (S3, S4, S6). No pilot results exist.',
+  banner: 'Proposed — not yet run',
+  source: 'Proposed design (S3, S4, S6). Not a report of completed pilot results.',
+}
+
+/* ---------- Gates ---------- */
+
+export const gatesPresent = {
+  illustrativeLine: 'Targets are illustrative, not fixed benchmarks. Final thresholds are set after each university’s baseline and agreed with its stakeholders.',
+  framework: 'A structured decision framework, not a guarantee.',
+  step1Lead: 'Three outcomes,',
+  step1Accent: 'one rule each.',
+}
+
+export const verdictShort: Record<'GO' | 'ITERATE' | 'STOP', { label: string; rule: string }> = {
+  GO: { label: 'GO', rule: 'Students return, listings hold up, attendance improves, costs work, the buyer renews.' },
+  ITERATE: { label: 'ITERATE', rule: 'Inconclusive, or one testable fix: a single controlled retest.' },
+  STOP: { label: 'STOP', rule: 'Weak repeat use, no authorised data, or buyers reject viable terms.' },
 }
 
 /** Gate tiles: threshold ring (0–100 scale) + label ≤ 4 words including the sub-label. */
@@ -78,12 +69,6 @@ export const gateTiles: { id: string; value: string; title: string; sub: string;
   { id: 'wau', value: '≥ 20%', title: 'Weekly active', sub: 'of activated', ring: 20 },
   { id: 'meaningful', value: '≥ 30%', title: 'Meaningful action', sub: 'of WAU', ring: 30 },
   { id: 'accuracy', value: '≥ 95%', title: 'Listing accuracy', sub: 'sampled', ring: 95 },
-  { id: 'attendance', value: '+15%', title: 'Attendance uplift', sub: 'verified, relative', ring: 15 },
+  { id: 'attendance', value: '+15%', title: 'Verified attendance', sub: 'vs baseline', ring: 15 },
   { id: 'renewal', value: 'Agreed', title: 'Paid renewal', sub: 'viable price', ring: null },
 ]
-
-export const pilotStrip = {
-  believed: 'A good demo would justify going on',
-  learned: 'Evidence must be defined before the pilot',
-  changed: 'One paid, controlled pilot with stop rules',
-}

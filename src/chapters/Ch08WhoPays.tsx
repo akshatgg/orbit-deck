@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { PathCard, type PathDetail, type PathState } from '../components/bmd/PathCard'
 import { PathConnectors, PathNode, verdictStates } from '../components/bmd/PathNode'
-import { ChapterHeader, EvidenceTag, Expandable, LearningCard, LearningStrip, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
+import { ChapterHeader, EvidenceTag, Expandable, LearningCard, Reveal, SourceNote, SplitHeadline, Stage, StageLabel, ease } from '../components/ui'
 import { chapters } from '../data/chapters'
 import { pitchConfig } from '../data/config'
 import type { Learning } from '../data/evidence'
@@ -15,7 +15,7 @@ const learning: Learning = {
   believed: 'The product could monetise several ways at once.',
   investigated: 'Three revenue models compared on payer, value, evidence and unknowns.',
   learned: 'None has purchasing evidence. Student payment looks weakest.',
-  changed: 'University SaaS is the working hypothesis. Organiser referrals become a separate future test.',
+  changed: 'University SaaS is the working hypothesis, an untested guess. Organiser referrals become a separate future test.',
 }
 
 const gbp = (n: number) => `£${n.toLocaleString('en-GB')}`
@@ -132,7 +132,7 @@ function Decision({ show }: { show: boolean }) {
         student access.
       </p>
       <p className="mt-2.5 flex items-center gap-2 text-base text-amber">
-        <span className="h-1.5 w-1.5 rounded-full bg-amber" /> We have not yet proven this is the winning business model.
+        <span className="h-1.5 w-1.5 rounded-full bg-amber" /> We have not yet proven this is the winning business model. It is an untested guess.
       </p>
     </Reveal>
   )
@@ -214,74 +214,36 @@ export default function Ch08WhoPays({ mode, step }: ChapterProps) {
   }
 
   /* ---------------- Present ---------------- */
-  const verdict = step === 3
+  const verdict = step >= 1
   const states: PathState[] = revenueModels.map((m) => (verdict ? verdictStates[m.id] : 'normal'))
   return (
     <Stage mode={mode} className="sm:!justify-start sm:!pb-[56px] sm:!pt-[76px]">
       <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div>{header}</div>
-        <div className={`flex flex-1 flex-col ${verdict ? 'justify-start' : 'justify-center pb-8'}`}>
-          {step === 0 && (
-            <div className="mt-10 flex flex-col items-center gap-10">
-              <div className="relative w-full">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute left-1/2 top-1/2 h-[220%] w-[60%] -translate-x-1/2 -translate-y-1/2"
-                  style={{
-                    background: 'radial-gradient(closest-side, rgba(139,92,246,0.32), transparent 70%)',
-                  }}
-                />
-                <div className="relative scale-[1.12] py-2">
-                  <Root compact={false} />
-                </div>
-              </div>
-              <p className="text-center text-[clamp(2rem,4.2vw,3.8rem)] font-semibold leading-tight tracking-[-0.025em] text-snow">
-                <SplitHeadline text="Students would use it. *Who would pay?*" />
-              </p>
+        <div className="flex flex-1 flex-col justify-center gap-3 pb-4">
+          <div className="mb-3 min-h-[3.4rem]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.p
+                key={verdict ? 'v' : 'q'}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.4, ease }}
+                className="text-[clamp(1.7rem,3.2vw,3rem)] font-semibold leading-[1.05] tracking-[-0.025em] text-snow"
+              >
+                <SplitHeadline text={verdict ? 'University-funded is our *working hypothesis.*' : 'Students would use it. *Who would pay?*'} />
+              </motion.p>
+            </AnimatePresence>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Root compact />
+            <PathConnectors show states={states} />
+            <div className="grid items-stretch gap-5 lg:grid-cols-3">
+              {revenueModels.map((m, i) => (
+                <PathNode key={m.id} m={m} index={i} variant={verdict ? 'verdict' : 'detail'} state={states[i]} size="lg" />
+              ))}
             </div>
-          )}
-
-          {(step === 1 || step === 3) && (
-            <div className="flex flex-col gap-1">
-              <div className={verdict ? '' : 'mt-3'}>
-                <Root compact />
-              </div>
-              <PathConnectors show states={states} />
-              <div className="grid items-stretch gap-5 lg:grid-cols-3">
-                {revenueModels.map((m, i) => (
-                  <PathNode key={m.id} m={m} index={i} variant={verdict ? 'verdict' : 'detail'} state={states[i]} size={verdict ? 'md' : 'lg'} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="mt-4 flex flex-col gap-12">
-              <p className="mt-2 text-center text-[clamp(2rem,4.2vw,3.8rem)] font-semibold leading-[1.05] tracking-[-0.025em] text-snow">
-                <SplitHeadline text="None has purchasing *evidence yet.*" />
-              </p>
-              <div className="grid items-stretch gap-5 lg:grid-cols-3">
-                {revenueModels.map((m, i) => (
-                  <PathNode key={m.id} m={m} index={i} variant="evidence" state="normal" />
-                ))}
-              </div>
-              <SourceNote>Qualitative comparison. No scores shown: none of the three has purchasing evidence yet.</SourceNote>
-            </div>
-          )}
-
-          {verdict && (
-            <div className="mt-4 flex flex-col gap-3">
-              <Reveal show>
-                <p className="text-[clamp(1.5rem,2.8vw,2.4rem)] font-semibold leading-tight tracking-[-0.02em] text-snow">
-                  <SplitHeadline text="University-funded is our *working hypothesis.*" />
-                </p>
-                <p className="mt-1.5 flex items-center gap-2 text-base text-amber">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber" /> Not yet proven as the winning model.
-                </p>
-              </Reveal>
-              <LearningStrip believed="Several ways to monetise at once." learned="None has purchasing evidence yet." changed="University SaaS is the working hypothesis." />
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </Stage>

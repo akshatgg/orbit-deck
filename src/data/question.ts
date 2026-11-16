@@ -43,3 +43,8 @@ export const orbitSubtitle = 'A New Venture Creation journey from observation to
 /** Present-mode (short) variants — the full strings above stay in Explore. */
 export const scenarioShort = 'Illustrative reconstruction'
 export const freezeShort = 'What if the problem isn’t *opportunities* — but *discovery?*'
+
+/** Step 0 — audience show of hands (present mode). Survey figure comes from data/research.ts, never retyped. */
+export const handsPrompt = 'Hands up if you found out about an event *after registration closed.*'
+export const handsKicker = 'The best opportunities are not always the ones we find.'
+export const handsSources = ['Email', 'WhatsApp', 'Careers portal', 'Societies', 'Friends']

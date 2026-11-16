@@ -82,3 +82,8 @@ export const shortRationale: Record<string, string> = {
   tech: 'Buildable; data rights and coverage uncertain.',
 }
 export const weakShort = 'Willingness to pay is the weak link.'
+
+/** Present-mode selection / hand-off line. */
+export const selectedShort = 'Selected: Orbit'
+export const nextShort = 'Next: Discovery'
+export const weakBadge = 'Weak point'

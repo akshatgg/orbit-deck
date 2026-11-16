@@ -3,7 +3,7 @@ import { ArrowRight, ChevronDown, FlaskConical } from 'lucide-react'
 import { useState } from 'react'
 import { chapterIndex, chapters } from '../../data/chapters'
 import { statusMeta, type Status } from '../../data/evidence'
-import { assumptions, trackerVerdict, type Assumption } from '../../data/assumptions'
+import { assumptions, assumptionsFootnote, trackerVerdict, type Assumption } from '../../data/assumptions'
 import { EvidenceTag, StatusPill } from '../ui'
 
 interface Props {
@@ -14,6 +14,11 @@ interface Props {
   /** Called instead of following chapter links (lets a side panel close itself). */
   onGoChapter?: (slug: string) => void
 }
+
+const GROUPS = [
+  { key: 'evidence', title: 'Evidence gathered' },
+  { key: 'pilot', title: 'Untested: pilot evidence needed' },
+] as const
 
 const ORDER: Status[] = ['supported', 'inconclusive', 'untested', 'contradicted']
 const PROPOSED = 'var(--color-ev-proposed)'
@@ -57,11 +62,23 @@ export function AssumptionTracker({ currentChapterIdx, full = false, onGoChapter
 
       {full && <Timeline />}
 
-      <ul className={`mt-6 gap-3 ${full ? 'grid lg:grid-cols-2' : 'space-y-3'}`}>
-        {assumptions.map((a) => (
-          <AssumptionRow key={a.id} a={a} reached={isReached(a)} onGoChapter={onGoChapter} />
-        ))}
-      </ul>
+      {GROUPS.map((g) => {
+        const list = assumptions.filter((a) => a.group === g.key)
+        return (
+          <section key={g.key} className="mt-6" aria-label={g.title}>
+            <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
+              <h3 className="text-base font-semibold tracking-tight text-snow">{g.title}</h3>
+              <span className="num font-mono text-xs text-dim">{list.length} of {total}</span>
+            </div>
+            <ul className={`gap-3 ${full ? 'grid lg:grid-cols-2' : 'space-y-3'}`}>
+              {list.map((a) => (
+                <AssumptionRow key={a.id} a={a} reached={isReached(a)} onGoChapter={onGoChapter} />
+              ))}
+            </ul>
+            {g.key === 'pilot' && <p className="mt-3 text-xs leading-snug text-dim">{assumptionsFootnote}</p>}
+          </section>
+        )
+      })}
     </div>
   )
 }
@@ -77,7 +94,7 @@ function AssumptionRow({ a, reached, onGoChapter }: { a: Assumption; reached: bo
         <div className="flex items-start gap-3">
           <span className="num mt-0.5 rounded-md bg-white/5 px-1.5 py-0.5 text-xs text-dim">{a.id}</span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-snug text-silver">{a.claim}</p>
+            <p className="text-sm leading-snug text-silver">{a.title}</p>
             <p className="mt-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-dim">Not yet discussed</p>
           </div>
         </div>
@@ -92,10 +109,10 @@ function AssumptionRow({ a, reached, onGoChapter }: { a: Assumption; reached: bo
           {a.id}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-medium leading-snug text-snow">{a.claim}</p>
+          <p className="text-[15px] font-semibold leading-snug text-snow">{a.title}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <StatusPill status={a.status} />
-            <span className="text-xs leading-snug text-silver">{a.statusText}</span>
+            <span className="text-xs leading-snug text-silver">{a.statusText.split(': ').slice(1).join(': ')}</span>
           </div>
         </div>
         <ChevronDown size={16} className={`mt-1 shrink-0 text-dim transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -104,6 +121,7 @@ function AssumptionRow({ a, reached, onGoChapter }: { a: Assumption; reached: bo
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
             <div className="space-y-3 border-t border-line px-4 pb-4 pt-3 text-sm leading-relaxed">
+              <p className="text-snow">{a.claim}</p>
               <div>
                 <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-dim">Evidence so far</div>
                 <p className="mt-1 text-snow/90">{a.evidence}</p>
@@ -146,9 +164,12 @@ const PHASES = [
   { key: 'p', title: 'Proposed pilot', sub: 'Not yet run', color: '#a78bfa', proposed: true },
 ] as const
 
-/** Which phase an assumption was first addressed in (all six begin as questions in phase 0). */
+/** Assumptions only the pilot can test (repeat use, attendance): shown as proposed, not yet run. */
+const pilotOnly = (a: Assumption) => a.chapter === 'gates'
+
+/** Which phase an assumption was first addressed in (all eight begin as questions in phase 0). */
 function phaseOf(a: Assumption): number {
-  if (a.chapter === 'experiment') return 4
+  if (pilotOnly(a)) return 4
   const c = chapters.find((x) => x.slug === a.chapter)
   if (!c) return 1
   return c.stage === 'ideation' ? 0 : c.stage === 'discovery' ? 1 : c.stage === 'bmd' ? 2 : 3
@@ -159,7 +180,7 @@ function Timeline() {
     <section className="mt-8" aria-label="From asking questions to obtaining evidence">
       <h3 className="font-mono text-[11px] uppercase tracking-[0.18em] text-violet-soft">From asking questions to obtaining evidence</h3>
       <p className="mt-2 max-w-3xl text-sm text-silver">
-        Every assumption starts as a question. The marker shows the stage where it was first tested against something, coloured by how strong the evidence is today. Only the first reached a supported state; the last is still only a proposal.
+        Every assumption starts as a question. The marker shows the stage where it was first tested against something, coloured by how strong the evidence is today. Only A1 reached a supported state; A6 and A7 can only be tested in the pilot, which has not run.
       </p>
 
       {/* desktop swimlane */}
@@ -177,12 +198,12 @@ function Timeline() {
         </div>
         {assumptions.map((a) => {
           const at = phaseOf(a)
-          const col = a.chapter === 'experiment' ? PROPOSED : statusMeta[a.status].color
+          const col = pilotOnly(a) ? PROPOSED : statusMeta[a.status].color
           return (
             <div key={a.id} className="grid grid-cols-[minmax(150px,1.1fr)_repeat(5,minmax(0,1fr))] items-center border-t border-line">
               <div className="px-3 py-3 text-xs leading-snug text-silver">
                 <span className="num mr-1.5 text-snow">{a.id}</span>
-                {a.claim.length > 52 ? a.claim.slice(0, 50).trimEnd() + '…' : a.claim}
+                {a.title}
               </div>
               {PHASES.map((p, i) => (
                 <div key={p.key} className="relative grid h-12 place-items-center border-l border-line/60">
@@ -196,12 +217,12 @@ function Timeline() {
                     <span
                       className="relative grid h-6 w-6 place-items-center rounded-full"
                       style={{
-                        border: `2px ${a.chapter === 'experiment' ? 'dashed' : 'solid'} ${col}`,
-                        background: a.chapter === 'experiment' ? 'transparent' : `color-mix(in srgb, ${col} 25%, #080d1a)`,
+                        border: `2px ${pilotOnly(a) ? 'dashed' : 'solid'} ${col}`,
+                        background: pilotOnly(a) ? 'transparent' : `color-mix(in srgb, ${col} 25%, #080d1a)`,
                       }}
-                      title={`${a.id}: ${a.chapter === 'experiment' ? 'proposed, not yet run' : statusMeta[a.status].label}`}
+                      title={`${a.id}: ${pilotOnly(a) ? 'proposed, not yet run' : statusMeta[a.status].label}`}
                     >
-                      {a.chapter === 'experiment' && <FlaskConical size={11} style={{ color: col }} />}
+                      {pilotOnly(a) && <FlaskConical size={11} style={{ color: col }} />}
                     </span>
                   ) : null}
                 </div>
@@ -221,17 +242,17 @@ function Timeline() {
                 {i + 1}. {p.title} <span className="text-xs font-normal text-dim">· {p.sub}</span>
               </div>
               {i === 0 ? (
-                <p className="mt-1.5 text-xs text-silver">All six assumptions begin here as questions.</p>
+                <p className="mt-1.5 text-xs text-silver">All eight assumptions begin here as questions.</p>
               ) : here.length === 0 ? (
                 <p className="mt-1.5 text-xs text-dim">No assumption first tested at this stage.</p>
               ) : (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {here.map((a) => {
-                    const col = a.chapter === 'experiment' ? PROPOSED : statusMeta[a.status].color
+                    const col = pilotOnly(a) ? PROPOSED : statusMeta[a.status].color
                     return (
-                      <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-snow" style={{ border: `1.5px ${a.chapter === 'experiment' ? 'dashed' : 'solid'} ${col}` }}>
+                      <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-snow" style={{ border: `1.5px ${pilotOnly(a) ? 'dashed' : 'solid'} ${col}` }}>
                         <span className="num" style={{ color: col }}>{a.id}</span>
-                        {a.chapter === 'experiment' ? 'proposed' : statusMeta[a.status].label.toLowerCase()}
+                        {pilotOnly(a) ? 'proposed' : statusMeta[a.status].label.toLowerCase()}
                       </span>
                     )
                   })}

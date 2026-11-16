@@ -110,6 +110,25 @@ export const sensitivity = {
   customersBelow: (k: number) => base2029.ebitda - k * (base2029.revenue / base2029.customers),
 }
 
+/**
+ * Headline financial indicators shown beside the Revenue/EBITDA chart (team report + financial model V3).
+ * Cross-checked against finYears above:
+ *  - NPV £240k at 9.27%: discounting 2027–31 net profit at 9.27% gives ≈ £238.5k (workbook figure £240k).
+ *  - Cash recovery 2030: cumulative net profit −£21,740 (2029) → +£126,550 (2030).
+ *  - 121% ROI: (8 × 2031 EBITDA £327,383 = £2.62m exit ÷ £50k equity)^(1/5) − 1 = 120.7% a year.
+ * ILLUSTRATIVE — the ROI is not a forecast of returns and nothing here is guaranteed.
+ */
+export const indicators = {
+  npv: { value: '£240k', label: 'NPV', detail: 'at a 9.27% discount rate' },
+  payback: { value: '2030', label: 'Cumulative project cash recovery', detail: 'cumulative net profit turns positive' },
+  roi: { value: '121%', label: 'Annualised investor ROI¹', detail: 'illustrative' },
+  footnote:
+    '¹ Illustrative calculation: assumes the founding team receives the full £2.62 million exit value, based on an 8× EBITDA valuation, for an initial investment of £50,000.',
+  discountRate: 0.0927,
+  exitMultiple: 8,
+  exitValue: 2_620_000,
+}
+
 export const gbp = (v: number, opts: { compact?: boolean; sign?: boolean } = {}) => {
   const abs = Math.abs(v)
   const s = opts.compact

@@ -6,7 +6,7 @@ export function Gates() {
   return (
     <div>
       <div className="flex items-center gap-2">
-        <EvidenceTag label="proposed" text="Proposed gates" />
+        <EvidenceTag label="proposed" text="Proposed gates · illustrative targets" />
       </div>
       <ul className="mt-3 grid gap-2">
         {scorecard.map((g) => (
